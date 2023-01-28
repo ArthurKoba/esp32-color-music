@@ -14,7 +14,7 @@
     #error I2S_WS_PIN required.
 #endif
 
-#include "BluetoothA2DPSink.h"
+
 
 BluetoothA2DPSink a2dp_sink;
 
