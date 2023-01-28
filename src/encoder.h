@@ -57,6 +57,7 @@ void setupEncoder() {
 }
 
 void execEncoder() {
+    if (!encoderData.isUpdated) return;
     int8_t volume = a2dp_sink.get_volume();
     if (volume == 0) volume == 127;
     if (encoderData.rotateState) {
