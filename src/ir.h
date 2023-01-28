@@ -3,10 +3,10 @@
 #endif
 
 #ifndef BRIGHT_STEP
-    #define BRIGHT_STEP 10
+    #define BRIGHT_STEP 5
 #endif
 
-#include <IRRemote.hpp>
+
 
 enum IRButtons { // Перечисление кнопок пульта.
     BRIGHT_UP_BUTTON, BRIGHT_DOWN_BUTTON, OFF_BUTTON, ON_BUTTON,
@@ -16,11 +16,6 @@ enum IRButtons { // Перечисление кнопок пульта.
     GOLD_BUTTON, GREENCYAN_BUTTON, ORCHID_BUTTON, FADE_BUTTON,
     YELLOW_BUTTON, NAVY_BUTTON, PINK_BUTTON, SMOOTH_BUTTON
 };
-
-
-void setupIR() {
-    IrReceiver.begin(IR_RECEIVE_PIN);
-}
 
 void setColor(uint8_t ledID)
 // Установка цветов согласно схеме пульта.
