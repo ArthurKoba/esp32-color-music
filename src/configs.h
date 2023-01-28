@@ -14,3 +14,4 @@
 #define BLUETOOTH_DEVICE_NAME "Koba Audio Receiver"
 
 #define DEFAULT_MODE COLOR_MUSIC_MODE
+#define BRIGHT_STEP 10
