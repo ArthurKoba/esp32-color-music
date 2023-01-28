@@ -7,7 +7,6 @@
 #endif
 
 
-
 enum IRButtons { // Перечисление кнопок пульта.
     BRIGHT_UP_BUTTON, BRIGHT_DOWN_BUTTON, OFF_BUTTON, ON_BUTTON,
     RED_BUTTON, GREEN_BUTTON, BLUE_BUTTON, WHITE_BUTTON,
@@ -17,11 +16,11 @@ enum IRButtons { // Перечисление кнопок пульта.
     YELLOW_BUTTON, NAVY_BUTTON, PINK_BUTTON, SMOOTH_BUTTON
 };
 
-void setColor(uint8_t ledID)
+void setColor(uint8_t ledId)
 // Установка цветов согласно схеме пульта.
 // Во многом сделано на основе цветов с сайта https://encycolorpedia.ru/
 {
-    switch (ledID) {
+    switch (ledId) {
         case RED_BUTTON:        FastLED.showColor(CRGB(255,   0,   0)); break;
         case GREEN_BUTTON:      FastLED.showColor(CRGB(  0, 255,   0)); break;
         case BLUE_BUTTON:       FastLED.showColor(CRGB(  0,   0, 255)); break;
@@ -43,41 +42,32 @@ void setColor(uint8_t ledID)
         case YELLOW_BUTTON:     FastLED.showColor(CRGB(255, 150,   0)); break;
         case NAVY_BUTTON:       FastLED.showColor(CRGB( 100,  0, 141)); break;
         case PINK_BUTTON:       FastLED.showColor(CRGB(211,  40, 158)); break;
+        default:                                                                       break;
     }
 }
 
-uint8_t execIrCommand (ColorModes &colorModes) {
-    if (!IrReceiver.decode()) return 0;
-
+void execIrCommand (ColorModes &colorModes) {
+    if (!IrReceiver.decode()) return;
     uint16_t command = IrReceiver.decodedIRData.command;
 
-    Serial.println("CMD: " + String(command));
-
-
     if (command == BRIGHT_UP_BUTTON || command == BRIGHT_DOWN_BUTTON) {
-        switch(command) {
-            case BRIGHT_UP_BUTTON:    colorModes.bright += BRIGHT_STEP; break;
-            case BRIGHT_DOWN_BUTTON:  colorModes.bright -= BRIGHT_STEP; break;
-            default:;
-        }
-        if (colorModes.bright > 255)    colorModes.bright = 255;
-        else if (colorModes.bright < 0) colorModes.bright = 1;
+        colorModes.bright += command == BRIGHT_UP_BUTTON ? BRIGHT_STEP : -BRIGHT_STEP;
+        colorModes.bright = constrain(colorModes.bright, 1, 255);
         FastLED.setBrightness(colorModes.bright);
         if (colorModes.mode == COLOR_MODE) setColor(colorModes.colorID);
     }
 
     switch (command) {
-        case BRIGHT_UP_BUTTON: case BRIGHT_DOWN_BUTTON:         break;
         case ON_BUTTON:     colorModes.mode = COLOR_MUSIC_MODE; break;
         case FLASH_BUTTON:  colorModes.mode = FLASH_MODE;       break;
         case STROBE_BUTTON: colorModes.mode = STROBE_MODE;      break;
         case FADE_BUTTON:   colorModes.mode = FADE_MODE;        break;
         case SMOOTH_BUTTON: colorModes.mode = SMOOTH_MODE;      break;
+        case BRIGHT_UP_BUTTON: case BRIGHT_DOWN_BUTTON:         break;
         default:
             colorModes.mode = COLOR_MODE;
             setColor(command);
             colorModes.colorID = command;
     }
     IrReceiver.resume();
-    return command;
 }
