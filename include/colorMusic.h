@@ -2,8 +2,7 @@
     #define SAMPLES_SIZE 2048
 #endif
 
-#define AMPLITUDES_SIZE SAMPLES_SIZE / 1
-
+#define AMPLITUDES_SIZE SAMPLES_SIZE / 2
 
 #include "esp_dsp.h"
 #include "cmath"
@@ -51,18 +50,6 @@ void calculateAmplitudes(const float *samples, float *amplitudes) {
     }
 }
 
-void colorMusic() {
-    if (fftData.samples.fullness != SAMPLES_SIZE) return;
-//    sendJsonArray(fftData.samples.left, 256, "samples");
-    uint16_t calcTime = millis();
-    calculateAmplitudes(fftData.samples.right, fftData.amplitudes.right);
-    calculateAmplitudes(fftData.samples.left, fftData.amplitudes.left);
-    Serial.println("Calc time (ms): " + String(millis() - calcTime));
-    calcTime = millis();
-    sendJsonArray(fftData.amplitudes.left, 128, "test");
-    Serial.println("Send time (ms): " + String(millis() - calcTime));
-    fftData.samples.fullness = 0;
-}
 
 void setupColorMusic() {
     fftData.samples.fullness = 0;
@@ -75,16 +62,10 @@ void setupColorMusic() {
 void appendSamples(const uint8_t *data, uint32_t length) {
     uint16_t samplesLength = length/4;
     auto frame = (Frame*)data;
-//    for (int i = 0; i < samplesLength && fftData.samples.fullness < SAMPLES_SIZE; i++) {
-//        fftData.samples.left[fftData.samples.fullness] = frame[i].channel1;
-//        fftData.samples.right[fftData.samples.fullness] = frame[i].channel2;
-//        fftData.samples.fullness++;
-//    }
-    for (int i = 0; i < samplesLength; i++) {
+    for (int i = 0; i < samplesLength && fftData.samples.fullness < SAMPLES_SIZE; i++) {
         fftData.samples.left[fftData.samples.fullness] = frame[i].channel1;
         fftData.samples.right[fftData.samples.fullness] = frame[i].channel2;
         fftData.samples.fullness++;
-        if (fftData.samples.fullness == SAMPLES_SIZE) colorMusic();
     }
 }
 
