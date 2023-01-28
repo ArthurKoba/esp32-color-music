@@ -1,15 +1,22 @@
 #include "configs.h"
 #include "imports.h"
 
+
+CRGB leds[NUM_LEDS];
+
 void setup() {
     Serial.begin(500000);
     setupA2DP();
     a2dp_sink.set_volume(64);
 //    setupEncoder();
-//    setupFastLED();
+
+    CFastLED::addLeds <WS2812, WS2812B_PIN, GRB>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+    FastLED.showColor(CRGB::Black);
+    IrReceiver.begin(IR_RECEIVE_PIN);
     setupColorModes();
     setupColorMusic();
-    setupIR();
+
+
     Serial.print('\n');
     Serial.print(BLUETOOTH_DEVICE_NAME);
     Serial.println(" Started!");
