@@ -19,7 +19,7 @@ struct Amplitudes {
     float right[AMPLITUDES_SIZE];
 };
 
-struct FFT_DATA {
+struct FFTData {
     Samples samples;
     Amplitudes amplitudes;
     bool useWindow;
@@ -28,7 +28,7 @@ struct FFT_DATA {
     float fftWindow[SAMPLES_SIZE] __attribute__((aligned(16)));
 };
 
-FFT_DATA fftData;
+FFTData fftData;
 
 void calculateAmplitudes(const float *samples, float *amplitudes) {
     float *buffer = fftData.buffer;
@@ -51,12 +51,12 @@ void calculateAmplitudes(const float *samples, float *amplitudes) {
 }
 
 
-void setupColorMusic() {
-    fftData.samples.fullness = 0;
-    fftData.useWindow = true;
-    fftData.logarithmResult = false;
-    dsps_wind_hann_f32(fftData.fftWindow, SAMPLES_SIZE);
-    dsps_fft2r_init_fc32(NULL, CONFIG_DSP_MAX_FFT_SIZE);
+void setupColorMusic(FFTData &data) {
+    data.samples.fullness = 0;
+    data.useWindow = true;
+    data.logarithmResult = false;
+    dsps_wind_hann_f32(data.fftWindow, SAMPLES_SIZE);
+    dsps_fft2r_init_fc32(nullptr, SAMPLES_SIZE);
 }
 
 void appendSamples(const uint8_t *data, uint32_t length) {
@@ -68,8 +68,6 @@ void appendSamples(const uint8_t *data, uint32_t length) {
         fftData.samples.fullness++;
     }
 }
-
-
 
 float getAmplitudeSignal(const float *samples) {
     float minValue = 0.0;
