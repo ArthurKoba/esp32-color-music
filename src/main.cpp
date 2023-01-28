@@ -3,6 +3,7 @@
 
 
 CRGB leds[NUM_LEDS];
+BluetoothA2DPSink a2dp_sink;
 
 void setup() {
     Serial.begin(500000);
