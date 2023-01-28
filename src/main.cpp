@@ -12,7 +12,7 @@ void setup() {
     FastLED.setBrightness(colorModes.bright);
     FastLED.showColor(CRGB::Black);
     a2dp_sink.set_pin_config(i2sPins);
-    a2dp_sink.set_stream_reader(appendSamples);
+    a2dp_sink.set_raw_stream_reader(appendSamples);
     a2dp_sink.set_on_volumechange(change_volume);
     a2dp_sink.start(BLUETOOTH_DEVICE_NAME);
     a2dp_sink.set_volume(64);
