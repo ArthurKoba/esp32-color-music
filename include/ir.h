@@ -6,6 +6,10 @@
     #define BRIGHT_STEP 5
 #endif
 
+#ifndef MINIMAL_BRIGHT
+    #define MINIMAL_BRIGHT 5
+#endif
+
 
 enum IRButtons { // Перечисление кнопок пульта.
     BRIGHT_UP_BUTTON, BRIGHT_DOWN_BUTTON, OFF_BUTTON, ON_BUTTON,
@@ -52,7 +56,7 @@ void execIrCommand (ColorModes &colorModes) {
 
     if (command == BRIGHT_UP_BUTTON || command == BRIGHT_DOWN_BUTTON) {
         colorModes.bright += command == BRIGHT_UP_BUTTON ? BRIGHT_STEP : -BRIGHT_STEP;
-        colorModes.bright = constrain(colorModes.bright, 1, 255);
+        colorModes.bright = constrain(colorModes.bright, MINIMAL_BRIGHT, 255);
         FastLED.setBrightness(colorModes.bright);
         if (colorModes.mode == COLOR_MODE) setColor(colorModes.colorID);
     }
