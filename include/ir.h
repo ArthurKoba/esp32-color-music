@@ -25,7 +25,7 @@ void setColor(uint8_t ledId)
         case GREEN_BUTTON:      FastLED.showColor(CRGB(  0, 255,   0)); break;
         case BLUE_BUTTON:       FastLED.showColor(CRGB(  0,   0, 255)); break;
         case WHITE_BUTTON:      FastLED.showColor(CRGB(255, 255, 255)); break;
-        case OFF_MODE:          FastLED.showColor(CRGB(  0,   0,   0)); break;
+        case OFF_BUTTON:        FastLED.showColor(CRGB(  0,   0,   0)); break;
 
         case ORANGERED_BUTTON:  FastLED.showColor(CRGB(255,  50,   0)); break;
         case LIME_BUTTON:       FastLED.showColor(CRGB(100, 255,   0)); break;
