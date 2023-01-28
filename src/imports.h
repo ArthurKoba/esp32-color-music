@@ -1,11 +1,10 @@
 #include "Arduino.h"
 #include "BluetoothA2DPSink.h"
-#include <FastLED.h>
 #include <IRRemote.hpp>
-
+#include <FastLED.h>
 
 #include "serialPortInteraction.h"
-#include "colorMusic.h"
+#include "colorMusicCore.h"
 #include "colorModes.h"
 
 #include "audioReceiver.h"
