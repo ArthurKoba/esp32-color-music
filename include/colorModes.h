@@ -1,3 +1,5 @@
+#include <FastLED.h>
+
 #ifndef FLASH_MODE_DELAY_MS
     #define FLASH_MODE_DELAY_MS 200
 #endif
@@ -31,7 +33,7 @@
 #endif
 
 #ifndef DEFAULT_MODE
-    #define DEFAULT_MODE COLOR_MUSIC_MODE
+    #define DEFAULT_MODE SMOOTH_MODE
 #endif
 
 #ifndef DEFAULT_BRIGHT
@@ -58,29 +60,27 @@ struct ColorModes{
     struct FadeModeData fade;
     struct SmoothModeData smooth;
     struct RainbowModeData rainbow;
-} colorModes;
+};
 
 
-
-void setupColorModes()
-// Функуция инициализации стрктуры световых режимов.
+void setupColorModes(ColorModes &data)
+// Функция инициализации структуры световых режимов.
 {
-    colorModes.mode = DEFAULT_MODE; // Стандартный режим при запуске микроконтроллера.
-    colorModes.flash.delayMs = FLASH_MODE_DELAY_MS;
-    colorModes.flash.index = 5;
-    colorModes.flash.dir = true;
-    colorModes.strobe.delayMs = STROBE_MODE_DELAY_MS;
-    colorModes.fade.delayMs = FADE_MODE_DELAY_MS;
-    colorModes.fade.index = (FADE_MODE_MAX_LEVEL - FADE_MODE_LOW_LEVEL) >> 1;
-    colorModes.smooth.delayMs = SMOOTH_MODE_DELAY_MS;
-    colorModes.rainbow.delayMs = RAINBOW_MODE_DELAY_MS;
-    colorModes.bright = DEFAULT_BRIGHT;
-    FastLED.setBrightness(colorModes.bright);
+    data.mode = DEFAULT_MODE; // Стандартный режим при запуске микроконтроллера.
+    data.bright = DEFAULT_BRIGHT;
+    data.flash.delayMs = FLASH_MODE_DELAY_MS;
+    data.flash.index = 5;
+    data.flash.dir = true;
+    data.strobe.delayMs = STROBE_MODE_DELAY_MS;
+    data.fade.delayMs = FADE_MODE_DELAY_MS;
+    data.fade.index = (FADE_MODE_MAX_LEVEL - FADE_MODE_LOW_LEVEL) >> 1;
+    data.smooth.delayMs = SMOOTH_MODE_DELAY_MS;
+    data.rainbow.delayMs = RAINBOW_MODE_DELAY_MS;
 }
 
 
-void rainbowColorMode(RainbowModeData &data) {
-    for (int i = 0; i < NUM_LEDS; i++) leds[i] = CHSV(data.index - i, 255, 255);
+void rainbowColorMode(CRGB *leds, RainbowModeData &data) {
+    for (int i = 0; i < NUM_LEDS; i++) leds[i] = static_cast<CRGB>(CHSV(data.index - i, 255, 255));
     FastLED.show();
     data.index++;
     delay(data.delayMs);
@@ -137,19 +137,19 @@ void smoothColorMode(SmoothModeData &data)
 // Режим плавного (бесшовного) переливания цветов за счет индекса, который храниться в структуре режима.
 // Так как индекс принимает значения от 0 до 255, а цвета три, диапазон индекса поделен на три и равен 85.
 {
-    if (data.index <= 85) { // Наростание яркости красного канала и понижение яркости синего канала.
+    if (data.index <= 85) { // Нарастание яркости красного канала и понижение яркости синего канала.
         FastLED.showColor(CRGB(
                 map(data.index, 0, 85, SMOOTH_MODE_LOW_LEVEL, SMOOTH_MODE_MAX_LEVEL),
                 SMOOTH_MODE_LOW_LEVEL,
                 map(data.index, 0, 85, SMOOTH_MODE_MAX_LEVEL, SMOOTH_MODE_LOW_LEVEL)
         ));
-    } else if (data.index <= 170) { // Наростание яркости зеленого канала и понижение яркости красного канала.
+    } else if (data.index <= 170) { // Нарастание яркости зеленого канала и понижение яркости красного канала.
         FastLED.showColor(CRGB(
                 map(data.index, 86, 170, SMOOTH_MODE_MAX_LEVEL, SMOOTH_MODE_LOW_LEVEL),
                 map(data.index, 86, 170, SMOOTH_MODE_LOW_LEVEL, SMOOTH_MODE_MAX_LEVEL),
                 SMOOTH_MODE_LOW_LEVEL
         ));
-    } else { // Наростание яркости синего канала и понижение яркости зеленого канала.
+    } else { // Нарастание яркости синего канала и понижение яркости зеленого канала.
         FastLED.showColor(CRGB(
                 SMOOTH_MODE_LOW_LEVEL,
                 map(data.index, 171, 255, SMOOTH_MODE_MAX_LEVEL, SMOOTH_MODE_LOW_LEVEL),
