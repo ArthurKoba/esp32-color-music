@@ -88,7 +88,7 @@ void execIrCommandTest() {
 
 void loop() {
 //    colorMusic();
-//    execEncoder();
+    execEncoder(a2dp_sink);
 //    execIrCommand(colorModes);
     execIrCommandTest();
     switch (colorModes.mode) {

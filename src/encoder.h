@@ -56,10 +56,9 @@ void setupEncoder() {
   encoderData.lastUpdateAngle = millis();
 }
 
-void execEncoder() {
+void execEncoder(BluetoothA2DPSink &a2dp_sink) {
     if (!encoderData.isUpdated) return;
-    int8_t volume = a2dp_sink.get_volume();
-    if (volume == 0) volume == 127;
+    int volume = a2dp_sink.get_volume();
     if (encoderData.rotateState) {
         uint8_t step = 5;
         if (encoderData.isPressed) step = 1;
