@@ -67,6 +67,7 @@ void calculateAmplitudes(const int16_t *samples, float *amplitudes) {
         if (isinf(amplitudes[i])) amplitudes[i] = 70000000000.0;
         if (isnan(amplitudes[i])) amplitudes[i] = -70000000000.0;
     }
+    delete[] buffer;
 }
 
 
