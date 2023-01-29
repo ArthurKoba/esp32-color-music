@@ -44,7 +44,10 @@ FFTData fftData;
 void calculateAmplitudes(const int16_t *samples, float *amplitudes) {
     auto *buffer = new float[SAMPLES_SIZE * 2];
     for (int i = 0; i < SAMPLES_SIZE; i++) {
-        buffer[i * 2 + 0] = fftData.useWindow ? samples[i] * fftData.fftWindow[i] : samples[i];
+        if (fftData.useWindow)
+            buffer[i * 2 + 0] = (float) samples[i] * fftData.fftWindow[i];
+        else
+            buffer[i * 2 + 0] = (float) samples[i];
         buffer[i * 2 + 1] = 0;
     }
 
