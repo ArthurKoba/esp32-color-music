@@ -20,7 +20,7 @@ struct Amplitudes {
 };
 
 enum SEND_TYPE {
-    LIN, BARK, LOG, WINDOW
+    LIN, BARK, LOG, WINDOW, BARK_SCALE
 };
 
 struct FFTData {

@@ -38,10 +38,15 @@ void colorMusic() {
 //    Serial.println("Calc time (ms): " + String(info[0]));
 
     calcTime = millis();
-    if (fftData.sendType == WINDOW) {
-        sendJsonArray(fftData.fftWindow, SAMPLES_SIZE, "test");
-    } else {
-        sendAmplitudesArea(fftData.amplitudes.left, AMPLITUDES_SIZE, "test", fftArea);
+    switch (fftData.sendType) {
+        case WINDOW:
+            sendJsonArray(fftData.fftWindow, SAMPLES_SIZE, "window");
+            break;
+        case BARK_SCALE:
+            sendJsonArray(fftData.barkScale, AMPLITUDES_SIZE, "bark");
+            break;
+        default:
+            sendAmplitudesArea(fftData.amplitudes.left, AMPLITUDES_SIZE, "fft", fftArea);
     }
     info[1] = millis() - calcTime;
     info[2] = fftArea;
@@ -120,6 +125,10 @@ void execIrCommandTest() {
         case 17:
             Serial.println("WINDOW dsps_wind_nuttall_f32");
             dsps_wind_nuttall_f32(fftData.fftWindow, SAMPLES_SIZE);
+            break;
+        case 18:
+            Serial.println("BARK EXIT");
+            fftData.sendType = BARK_SCALE;
             break;
     }
     IrReceiver.resume();
