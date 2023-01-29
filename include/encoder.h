@@ -70,10 +70,7 @@ void execEncoder(BluetoothA2DPSink &a2dp_sink) {
         uint8_t step = 5;
         if (encoderData.isPressed) step = 1;
         volume += encoderData.rotateState == 2  ? step : -step;
-        if (volume < -50) volume = 127;
-        else if (volume < 0) volume = 0;
-        a2dp_sink.set_volume(volume);
-        Serial.println("new encoder volume: " + String(volume));
+        a2dp_sink.set_volume(constrain(volume, 0, 127));
         encoderData.rotateState = 0;
     }
     encoderData.isUpdated = false;
