@@ -23,7 +23,8 @@ struct FFTData {
     Samples samples;
     Amplitudes amplitudes;
     bool useWindow;
-    bool logarithmResult;
+    float frequencyStep;
+    float barkScale[AMPLITUDES_SIZE];
     float buffer[SAMPLES_SIZE * 2] __attribute__((aligned(16)));
     float fftWindow[SAMPLES_SIZE] __attribute__((aligned(16)));
 };
@@ -51,11 +52,21 @@ void calculateAmplitudes(const float *samples, float *amplitudes) {
 }
 
 
-void setupColorMusic(FFTData &data) {
-    data.samples.fullness = 0;
-    data.useWindow = true;
-    data.logarithmResult = false;
-    dsps_wind_hann_f32(data.fftWindow, SAMPLES_SIZE);
+void generateBarkScaleTable(FFTData &fft) {
+    float base;
+    for (int i = 0; i < AMPLITUDES_SIZE; i++) {
+        base = (float) i * (fft.frequencyStep/650);
+        fft.barkScale[i] = 7 * logf(base + sqrtf(1 + base * base));
+    }
+    for (int i = 1; i < AMPLITUDES_SIZE; i++) fft.barkScale[i] /= fft.barkScale[AMPLITUDES_SIZE-1];
+}
+
+void setupColorMusic(FFTData &fft) {
+    fft.samples.fullness = 0;
+    fft.useWindow = true;
+    fft.sendType = LIN;
+    fft.frequencyStep = 1/((float)SAMPLES_SIZE/44100);
+    dsps_wind_hann_f32(fft.fftWindow, SAMPLES_SIZE);
     dsps_fft2r_init_fc32(nullptr, SAMPLES_SIZE);
 }
 
