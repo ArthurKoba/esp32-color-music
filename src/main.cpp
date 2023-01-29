@@ -70,19 +70,19 @@ void execIrCommandTest() {
             break;
         case OFF_BUTTON:    colorModes.mode = COLOR_MODE;           break;
         case ON_BUTTON:     colorModes.mode = COLOR_MUSIC_MODE;     break;
-        case 4:
-            Serial.println("LOG EXIT");
-            fftData.sendType = LOG;
-            break;
-        case 5:
-            Serial.println("BARK EXIT");
-            fftData.sendType = BARK;
-            break;
-        case 6:
+        case RED_BUTTON:
             Serial.println("LIN EXIT");
             fftData.sendType = LIN;
             break;
-        case 7:
+        case GREEN_BUTTON:
+            Serial.println("BARK EXIT");
+            fftData.sendType = BARK;
+            break;
+        case BLUE_BUTTON:
+            Serial.println("LOG EXIT");
+            fftData.sendType = LOG;
+            break;
+        case WHITE_BUTTON:
             Serial.println("WINDOW EXIT");
             fftData.sendType = WINDOW;
             break;
