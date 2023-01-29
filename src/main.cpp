@@ -6,7 +6,7 @@ ColorModes colorModes;
 BluetoothA2DPSink a2dp_sink;
 
 void setup() {
-    Serial.begin(500000);
+    Serial.begin(SERIAL_SPEED);
     setupColorModes(colorModes);
     CFastLED::addLeds<WS2812B, WS2812B_PIN, GRB>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
     FastLED.setBrightness(colorModes.bright);
