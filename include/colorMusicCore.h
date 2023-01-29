@@ -9,8 +9,8 @@
 #include "BluetoothA2DPSink.h"
 
 struct Samples {
-    float left[SAMPLES_SIZE];
-    float right[SAMPLES_SIZE];
+    int16_t left[SAMPLES_SIZE];
+    int16_t right[SAMPLES_SIZE];
     uint16_t fullness;
 };
 
@@ -26,6 +26,9 @@ enum SEND_TYPE {
 struct FFTData {
     Samples samples;
     Amplitudes amplitudes;
+    float barkScale[AMPLITUDES_SIZE];
+    float fftWindow[SAMPLES_SIZE] __attribute__((aligned(16)));
+//    float buffer[SAMPLES_SIZE * 2] __attribute__((aligned(16)));
     bool useWindow;
     uint8_t sendType;
     float frequencyStep;
@@ -38,8 +41,8 @@ struct FFTData {
 FFTData fftData;
 
 
-void calculateAmplitudes(const float *samples, float *amplitudes) {
-    float *buffer = fftData.buffer;
+void calculateAmplitudes(const int16_t *samples, float *amplitudes) {
+    auto *buffer = new float[SAMPLES_SIZE * 2];
     for (int i = 0; i < SAMPLES_SIZE; i++) {
         buffer[i * 2 + 0] = fftData.useWindow ? samples[i] * fftData.fftWindow[i] : samples[i];
         buffer[i * 2 + 1] = 0;
