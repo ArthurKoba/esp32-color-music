@@ -29,7 +29,9 @@ struct FFTData {
     float fftWindow[SAMPLES_SIZE] __attribute__((aligned(16)));
 };
 
+
 FFTData fftData;
+
 
 void calculateAmplitudes(const float *samples, float *amplitudes) {
     float *buffer = fftData.buffer;
@@ -65,6 +67,7 @@ void generateBarkScaleTable(FFTData &fft) {
     for (int i = 1; i < AMPLITUDES_SIZE; i++) fft.barkScale[i] /= fft.barkScale[AMPLITUDES_SIZE-1];
 }
 
+
 void setupColorMusic(FFTData &fft) {
     fft.samples.fullness = 0;
     fft.useWindow = true;
@@ -75,6 +78,7 @@ void setupColorMusic(FFTData &fft) {
     generateBarkScaleTable(fft);
 }
 
+
 void appendSamples(const uint8_t *data, uint32_t length) {
     uint16_t samplesLength = length/4;
     auto frame = (Frame*)data;
@@ -84,6 +88,7 @@ void appendSamples(const uint8_t *data, uint32_t length) {
         fftData.samples.fullness++;
     }
 }
+
 
 float getAmplitudeSignal(const float *samples) {
     float minValue = 0.0;
