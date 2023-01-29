@@ -19,10 +19,15 @@ struct Amplitudes {
     float right[AMPLITUDES_SIZE];
 };
 
+enum SEND_TYPE {
+    LIN, BARK, LOG, WINDOW
+};
+
 struct FFTData {
     Samples samples;
     Amplitudes amplitudes;
     bool useWindow;
+    uint8_t sendType;
     float frequencyStep;
     float barkScale[AMPLITUDES_SIZE];
     float buffer[SAMPLES_SIZE * 2] __attribute__((aligned(16)));
@@ -51,7 +56,6 @@ void calculateAmplitudes(const float *samples, float *amplitudes) {
         switch (fftData.sendType) {
             case BARK: amplitudes[i] /= fftData.barkScale[i]; break;
             case LOG: amplitudes[i] = 10 * log10f(temp/SAMPLES_SIZE); break;
-
         }
         if (amplitudes[i] < 1 || isnan(amplitudes[i])) amplitudes[i] = 0;
     }

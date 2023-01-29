@@ -24,62 +24,113 @@ void setup() {
     Serial.println(" Started!");
 }
 
-//uint8_t fftArea = 0;
-//bool sendWindow = false;
+uint8_t fftArea = 0;
+uint8_t info[3];
 
 void colorMusic() {
-//    if (fftData.samples.fullness != SAMPLES_SIZE) return;
-////    sendJsonArray(fftData.samples.left, 256, "samples");
-//    uint16_t calcTime = millis();
-//    calculateAmplitudes(fftData.samples.right, fftData.amplitudes.right);
-//    calculateAmplitudes(fftData.samples.left, fftData.amplitudes.left);
-//    calcTime = millis() - calcTime;
-//    Serial.print("Calc time (ms): " + String(calcTime));
-//    Serial.println(" Area: " + String(fftArea));
-//    if (sendWindow) {
-//        sendJsonArray(fftData.fftWindow, SAMPLES_SIZE, "test");
-//    } else {
-//        sendAmplitudesArea(fftData.amplitudes.left, AMPLITUDES_SIZE, "test", fftArea);
-//    }
-//
-////    calcTime = millis() - calcTime;
-////    Serial.println("Calc time (ms): " + String(calcTime));
-//    fftData.samples.fullness = 0;
+    if (fftData.samples.fullness != SAMPLES_SIZE) return;
+//    sendJsonArray(fftData.samples.left, 256, "samples");
+
+    uint16_t calcTime = millis();
+    calculateAmplitudes(fftData.samples.right, fftData.amplitudes.right);
+    calculateAmplitudes(fftData.samples.left, fftData.amplitudes.left);
+    info[0] = millis() - calcTime;
+//    Serial.println("Calc time (ms): " + String(info[0]));
+
+    calcTime = millis();
+    if (fftData.sendType == WINDOW) {
+        sendJsonArray(fftData.fftWindow, SAMPLES_SIZE, "test");
+    } else {
+        sendAmplitudesArea(fftData.amplitudes.left, AMPLITUDES_SIZE, "test", fftArea);
+    }
+    info[1] = millis() - calcTime;
+    info[2] = fftArea;
+    sendJsonArray(info, 3, "info");
+
+    fftData.samples.fullness = 0;
 }
 
-//void execIrCommandTest() {
-//    if (!IrReceiver.decode()) return;
-//    uint16_t command = IrReceiver.decodedIRData.command;
-//    Serial.println(String(command));
-//    switch (command) {
-//        case OFF_BUTTON:    colorModes.mode = COLOR_MODE;           break;
-//        case ON_BUTTON:     colorModes.mode = COLOR_MUSIC_MODE;     break;
-//        case 4:             fftData.useWindow = false;              break;
-//        case 5:             fftData.useWindow = true;               break;
-//        case 6:             fftData.logarithmResult = false;        break;
-//        case 7:             fftData.logarithmResult = true;         break;
-//        case 8:             fftArea = 0;         break;
-//        case 9:             fftArea = 1;         break;
-//        case 10:             fftArea = 2;         break;
-//        case 11:             fftArea = 3;         break;
-//        case 12: dsps_wind_blackman_f32(fftData.fftWindow, SAMPLES_SIZE); break;
-//        case 13: dsps_wind_blackman_harris_f32(fftData.fftWindow, SAMPLES_SIZE); break;
-//        case 14: dsps_wind_blackman_nuttall_f32(fftData.fftWindow, SAMPLES_SIZE); break;
-//        case 15: dsps_wind_flat_top_f32(fftData.fftWindow, SAMPLES_SIZE); break;
-//        case 16: dsps_wind_hann_f32(fftData.fftWindow, SAMPLES_SIZE); break;
-//        case 17: dsps_wind_nuttall_f32(fftData.fftWindow, SAMPLES_SIZE); break;
-//        case 18: sendWindow = false; break;
-//        case 19: sendWindow = true; break;
-//    }
-//    IrReceiver.resume();
-//}
+void execIrCommandTest() {
+    if (!IrReceiver.decode()) return;
+    uint16_t command = IrReceiver.decodedIRData.command;
+    Serial.println(String(command));
+    switch (command) {
+        case 0:
+            Serial.println("USE WINDOW TRUE");
+            fftData.useWindow = true;
+            break;
+        case 1:
+            Serial.println("USE WINDOW FALSE");
+            fftData.useWindow = false;
+            break;
+        case OFF_BUTTON:    colorModes.mode = COLOR_MODE;           break;
+        case ON_BUTTON:     colorModes.mode = COLOR_MUSIC_MODE;     break;
+        case 4:
+            Serial.println("LOG EXIT");
+            fftData.sendType = LOG;
+            break;
+        case 5:
+            Serial.println("BARK EXIT");
+            fftData.sendType = BARK;
+            break;
+        case 6:
+            Serial.println("LIN EXIT");
+            fftData.sendType = LIN;
+            break;
+        case 7:
+            Serial.println("WINDOW EXIT");
+            fftData.sendType = WINDOW;
+            break;
+        case 8:
+            Serial.println("AREA 1-256");
+            fftArea = 0;
+            break;
+        case 9:
+            Serial.println("AREA 256-512");
+            fftArea = 1;
+            break;
+        case 10:
+            Serial.println("AREA 512-768");
+            fftArea = 2;
+            break;
+        case 11:
+            Serial.println("AREA 768-1024");
+            fftArea = 3;
+            break;
+        case 12:
+            Serial.println("WINDOW dsps_wind_blackman_f32");
+            dsps_wind_blackman_f32(fftData.fftWindow, SAMPLES_SIZE);
+            break;
+        case 13:
+            Serial.println("WINDOW dsps_wind_blackman_harris_f32");
+            dsps_wind_blackman_harris_f32(fftData.fftWindow, SAMPLES_SIZE);
+            break;
+        case 14:
+            Serial.println("WINDOW dsps_wind_blackman_nuttall_f32");
+            dsps_wind_blackman_nuttall_f32(fftData.fftWindow, SAMPLES_SIZE);
+            break;
+        case 15:
+            Serial.println("WINDOW dsps_wind_flat_top_f32");
+            dsps_wind_flat_top_f32(fftData.fftWindow, SAMPLES_SIZE);
+            break;
+        case 16:
+            Serial.println("WINDOW dsps_wind_hann_f32");
+            dsps_wind_hann_f32(fftData.fftWindow, SAMPLES_SIZE);
+            break;
+        case 17:
+            Serial.println("WINDOW dsps_wind_nuttall_f32");
+            dsps_wind_nuttall_f32(fftData.fftWindow, SAMPLES_SIZE);
+            break;
+    }
+    IrReceiver.resume();
+}
 
 
 
 void loop() {
     execEncoder(a2dp_sink);
-    execIrCommand(colorModes);
-//    execIrCommandTest();
+//    execIrCommand(colorModes);
+    execIrCommandTest();
     switch (colorModes.mode) {
         case OFF_MODE:
         case COLOR_MODE: break;
