@@ -17,3 +17,7 @@
 
 #define DEFAULT_MODE COLOR_MUSIC_MODE
 #define BRIGHT_STEP 10
+
+#define NO_LED_FEEDBACK_CODE // remove warning IRRemote: No definition for LED_BUILTIN found -> default LED feedback is disabled.
+#define SEND_PWM_BY_TIMER // remove warning IRRemote: For ESP32, RP2040, mbed and particle boards SEND_PWM_BY_TIMER is enabled by default.
+#define FASTLED_INTERNAL // remove warning FastLED: No hardware SPI pins defined.  All SPI access will default to bitbanged output
