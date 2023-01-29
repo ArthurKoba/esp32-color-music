@@ -45,8 +45,12 @@ void calculateAmplitudes(const float *samples, float *amplitudes) {
     float temp;
     for (int i = 0 ; i < AMPLITUDES_SIZE ; i++) {
         temp = buffer[i * 2 + 0] * buffer[i * 2 + 0] + buffer[i * 2 + 1] * buffer[i * 2 + 1];
-        if (fftData.logarithmResult) amplitudes[i] = 10 * log10f(temp/SAMPLES_SIZE);
-        else amplitudes[i] = 2 * sqrtf(temp)/SAMPLES_SIZE;
+        if (fftData.sendType == LOG || fftData.sendType == BARK) amplitudes[i] = 2 * sqrtf(temp)/SAMPLES_SIZE;
+        switch (fftData.sendType) {
+            case BARK: amplitudes[i] /= fftData.barkScale[i]; break;
+            case LOG: amplitudes[i] = 10 * log10f(temp/SAMPLES_SIZE); break;
+
+        }
         if (amplitudes[i] < 1 || isnan(amplitudes[i])) amplitudes[i] = 0;
     }
 }
@@ -68,6 +72,7 @@ void setupColorMusic(FFTData &fft) {
     fft.frequencyStep = 1/((float)SAMPLES_SIZE/44100);
     dsps_wind_hann_f32(fft.fftWindow, SAMPLES_SIZE);
     dsps_fft2r_init_fc32(nullptr, SAMPLES_SIZE);
+    generateBarkScaleTable(fft);
 }
 
 void appendSamples(const uint8_t *data, uint32_t length) {
