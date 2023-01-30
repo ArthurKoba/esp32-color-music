@@ -13,6 +13,8 @@
 #define I2S_DATA_OUT_PIN 25
 #define I2S_WS_PIN 26
 
+#define SAMPLES_SIZE 1024
+
 #define BLUETOOTH_DEVICE_NAME "Koba Audio Receiver"
 
 #define DEFAULT_MODE COLOR_MUSIC_MODE
