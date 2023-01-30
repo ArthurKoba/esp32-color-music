@@ -58,16 +58,12 @@ void calculateAmplitudes(const int16_t *samples, float *amplitudes) {
         if (fftData.sendType == LIN || fftData.sendType == BARK)
             amplitudes[i] = 2 * sqrtf(temp)/SAMPLES_SIZE;
         switch (fftData.sendType) {
-            case BARK: amplitudes[i] *= fftData.barkScale[i]; break;
-            case LOG:
-                amplitudes[i] = 10 * log10f(temp/SAMPLES_SIZE);
-                if (amplitudes[i] < 0) amplitudes[i] = 0;
-                break;
+            case BARK:  amplitudes[i] *= fftData.barkScale[i];          break;
+            case LOG:   amplitudes[i] = 10 * log10f(temp/SAMPLES_SIZE); break;
         }
-        if (isinf(amplitudes[i])) amplitudes[i] = 70000000000.0;
-        if (isnan(amplitudes[i])) amplitudes[i] = -70000000000.0;
+        if (amplitudes[i] > 32767) amplitudes[i] = 32767;
+        if (amplitudes[i] < 0 || isinf(amplitudes[i]) || isnan(amplitudes[i])) amplitudes[i] = 0;
     }
-    delete[] buffer;
 }
 
 
