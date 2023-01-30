@@ -35,6 +35,7 @@ void setup() {
     Serial.begin(SERIAL_SPEED);
     setupColorModes(colorModes);
     CFastLED::addLeds<WS2812B, WS2812B_PIN, GRB>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+    FastLED.setMaxRefreshRate(0, false);
     FastLED.setBrightness(colorModes.bright);
     FastLED.showColor(CRGB::Black);
     a2dp_sink.set_pin_config(i2sPins);
