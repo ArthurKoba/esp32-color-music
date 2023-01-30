@@ -88,11 +88,13 @@ void generateCustomBarkScaleTable(FFTData &fft) {
 void setupColorMusic(FFTData &fft) {
     fft.samples.fullness = 0;
     fft.useWindow = true;
-    fft.sendType = LIN;
+    fft.sendType = BARK;
     fft.frequencyStep = 1/((float)SAMPLES_SIZE/44100);
-    dsps_wind_hann_f32(fft.fftWindow, SAMPLES_SIZE);
+    dsps_wind_flat_top_f32(fft.fftWindow, SAMPLES_SIZE);
+//    dsps_wind_hann_f32(fft.fftWindow, SAMPLES_SIZE);
     dsps_fft2r_init_fc32(nullptr, SAMPLES_SIZE);
-    generateCustomBarkScaleTable(fft);
+//    generateCustomBarkScaleTable(fft);
+    generateBarkScaleTable(fft);
 }
 
 
