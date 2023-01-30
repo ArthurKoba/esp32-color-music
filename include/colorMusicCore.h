@@ -32,9 +32,6 @@ struct FFTData {
     bool useWindow;
     uint8_t sendType;
     float frequencyStep;
-    float barkScale[AMPLITUDES_SIZE];
-    float buffer[SAMPLES_SIZE * 2] __attribute__((aligned(16)));
-    float fftWindow[SAMPLES_SIZE] __attribute__((aligned(16)));
 };
 
 
