@@ -5,6 +5,8 @@ CRGB leds[NUM_LEDS];
 ColorModes colorModes;
 BluetoothA2DPSink a2dp_sink;
 
+uint16_t timeFullness = 0;
+
 void callbackChangeConnectionState(esp_a2d_connection_state_t state, void *obj) {
     Serial.println("Change connection state: " + String(state));
     if (state == ESP_A2D_CONNECTION_STATE_CONNECTED) {
@@ -20,6 +22,8 @@ void callbackAVRCMetadata(uint8_t param, const uint8_t *text, int length) {
     Serial.write(text, length);
     Serial.println();
     for (auto & led : leds) led = CRGB::Black;
+    fftData.samples.fullness = 0;
+    timeFullness = millis();
 }
 
 void callbackOnChangeAudioState(esp_a2d_audio_state_t state, void *obj) {
@@ -60,7 +64,6 @@ void setup() {
 uint8_t fftArea = 0;
 uint8_t fastAmplitudes[AMPLITUDES_SIZE];
 uint8_t sendFullAmplitudes = false;
-uint16_t timeFullness = 0;
 bool useDivision = false;
 int16_t info[5];
 
@@ -84,8 +87,15 @@ void colorMusic() {
         fastAmplitudes[i] = (int16_t) fftData.amplitudes.left[i] >> 6;
         if (useDivision) fastAmplitudes[i] >>=3;
     }
+    fftData.samples.fullness = 0;
+
+    calcTime = millis();
+    calculateColors(fastAmplitudes);
+    info[1] = (int16_t) (millis() - calcTime);
+
     calcTime = millis();
     switch (fftData.sendType) {
+        case OFF_SHOW: break;
         case WINDOW:
             sendJsonArray(fftData.fftWindow, SAMPLES_SIZE, "window");
             break;
