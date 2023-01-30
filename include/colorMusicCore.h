@@ -73,7 +73,7 @@ void generateBarkScaleTable(FFTData &fft) {
         base = (float) i * (fft.frequencyStep/650);
         fft.barkScale[i] = 7 * logf(base + sqrtf(1 + base * base));
     }
-    for (int i = 1; i < AMPLITUDES_SIZE; i++) fft.barkScale[i] /= fft.barkScale[AMPLITUDES_SIZE-1];
+//    for (int i = 1; i < AMPLITUDES_SIZE; i++) fft.barkScale[i] /= fft.barkScale[AMPLITUDES_SIZE-1];
 }
 
 void generateCustomBarkScaleTable(FFTData &fft) {
