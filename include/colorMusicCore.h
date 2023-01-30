@@ -28,7 +28,7 @@ struct FFTData {
     Amplitudes amplitudes;
     float barkScale[AMPLITUDES_SIZE];
     float fftWindow[SAMPLES_SIZE] __attribute__((aligned(16)));
-//    float buffer[SAMPLES_SIZE * 2] __attribute__((aligned(16)));
+    float buffer[SAMPLES_SIZE * 2] __attribute__((aligned(16)));
     bool useWindow;
     uint8_t sendType;
     float frequencyStep;
@@ -42,7 +42,7 @@ FFTData fftData;
 
 
 void calculateAmplitudes(const int16_t *samples, float *amplitudes) {
-    auto *buffer = new float[SAMPLES_SIZE * 2];
+    auto *buffer = fftData.buffer;
     for (int i = 0; i < SAMPLES_SIZE; i++) {
         if (fftData.useWindow)
             buffer[i * 2 + 0] = (float) samples[i] * fftData.fftWindow[i];
