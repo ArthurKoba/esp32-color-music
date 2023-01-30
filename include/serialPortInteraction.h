@@ -25,7 +25,7 @@ void sendJsonArray(float *arr, const uint16_t arrSize, String dataType = "null")
   Serial.println("]}");
 }
 
-void sendAmplitudesArea(float *arr, const uint16_t arrSize, String dataType = "null", uint8_t area = 0) {
+void sendAmplitudesArea(uint8_t *arr, const uint16_t arrSize, String dataType = "null", uint8_t area = 0) {
     sendDataType(dataType);
     uint16_t startIndex, stopIndex;
     switch (area) {

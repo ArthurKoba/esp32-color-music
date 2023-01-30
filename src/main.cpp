@@ -56,19 +56,31 @@ void setup() {
     Serial.println(" Started!");
 }
 
+
 uint8_t fftArea = 0;
-uint8_t info[3];
+uint8_t fastAmplitudes[AMPLITUDES_SIZE];
+uint8_t sendFullAmplitudes = false;
+uint16_t timeFullness = 0;
+bool useDivision = false;
+int16_t info[5];
+
 
 void colorMusic() {
     if (fftData.samples.fullness != SAMPLES_SIZE) return;
+    info[4] = (int16_t) (millis() - timeFullness);
+    timeFullness = millis();
 //    sendJsonArray(fftData.samples.left, 256, "samples");
 
     uint16_t calcTime = millis();
     calculateAmplitudes(fftData.samples.right, fftData.amplitudes.right);
     calculateAmplitudes(fftData.samples.left, fftData.amplitudes.left);
-    info[0] = millis() - calcTime;
+    info[0] = (int16_t) (millis() - calcTime);
 //    Serial.println("Calc time (ms): " + String(info[0]));
 
+    for (int i = 0; i < AMPLITUDES_SIZE; ++i) {
+        fastAmplitudes[i] = (int16_t) fftData.amplitudes.left[i] >> 6;
+        if (useDivision) fastAmplitudes[i] >>=3;
+    }
     calcTime = millis();
     switch (fftData.sendType) {
         case WINDOW:
@@ -78,13 +90,15 @@ void colorMusic() {
             sendJsonArray(fftData.barkScale, AMPLITUDES_SIZE, "bark");
             break;
         default:
-            sendAmplitudesArea(fftData.amplitudes.left, AMPLITUDES_SIZE, "fft", fftArea);
+            if (sendFullAmplitudes) {
+                sendJsonArray(fastAmplitudes, AMPLITUDES_SIZE, "fft");
+            } else {
+                sendAmplitudesArea(fastAmplitudes, AMPLITUDES_SIZE, "fft", fftArea);
+            }
     }
-    info[1] = millis() - calcTime;
-    info[2] = fftArea;
-    sendJsonArray(info, 3, "info");
-
-    fftData.samples.fullness = 0;
+    info[2] = (int16_t) (millis() - calcTime);
+    info[3] = fftArea;
+    sendJsonArray(info, 5, "info");
 }
 
 void execIrCommandTest() {
