@@ -61,8 +61,6 @@ enum SendType : uint8_t {
 uint8_t fftArea = 0;
 uint8_t fastAmplitudes[AMPLITUDES_SIZE];
 uint8_t sendType = AMPLITUDES_AREA;
-
-uint32_t timeFullness = 0;
 bool useDivision = false;
 uint32_t info[5];
 
@@ -72,8 +70,6 @@ uint32_t info[5];
 
 void colorMusic() {
     if (fftData.samples.fullness != SAMPLES_SIZE) return;
-    info[4] = millis() - timeFullness;
-    timeFullness = millis();
 //    sendJsonArray(fftData.samples.left, 256, "samples");
 
     uint32_t calcTime = millis();
@@ -109,7 +105,7 @@ void colorMusic() {
     }
     info[2] = millis() - calcTime;
     info[3] = fftArea;
-    sendJsonArray(info, 5, "info");
+    sendJsonArray(info, 4, "info");
 }
 
 

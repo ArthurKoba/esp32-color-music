@@ -92,6 +92,7 @@ void callbackSampleRate(uint16_t sampleRate) {
     float frequencyStep = 1/((float) SAMPLES_SIZE/ (float) sampleRate);
     Serial.println("frequencyStep: " + String(frequencyStep));
     if (frequencyStep != fftData.frequencyStep) {
+        fftData.frequencyStep = frequencyStep;
 //        generateCustomBarkScaleTable(fftData);
         generateBarkScaleTable(fftData);
     }
@@ -140,9 +141,10 @@ void callbackAppendSamples(const uint8_t *data, uint32_t length) {
 }
 
 
-float getAmplitudeSignal(const float *samples) {
-    float minValue = 0.0;
-    float maxValue = 0.0;
+
+int32_t getAmplitudeSignal(const int16_t *samples) {
+    int16_t minValue = 0;
+    int16_t maxValue = 0;
     for (int i = 0; i < SAMPLES_SIZE; i++) {
         if (samples[i] > maxValue) maxValue = samples[i];
         if (samples[i] < minValue) minValue = samples[i];
