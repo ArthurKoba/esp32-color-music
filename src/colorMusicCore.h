@@ -14,7 +14,6 @@
 
 #include "BluetoothA2DPSink.h"
 #include <FastLED.h>
-#include "calcColors.h"
 #include "esp_dsp.h"
 #include "cmath"
 
