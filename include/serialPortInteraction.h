@@ -49,9 +49,9 @@ void sendAmplitudesArea(uint8_t *arr, const uint16_t arrSize, String dataType = 
             stopIndex = arrSize;
             break;
         case 0:
-        default:
             startIndex = 0;
             stopIndex = arrSize/4;
+        default: break;
     }
 
     Serial.print("[" + String(arr[startIndex]));
