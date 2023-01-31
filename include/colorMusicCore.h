@@ -107,13 +107,35 @@ void setupColorMusic(FFTData &fft) {
 }
 
 
-void appendSamples(const uint8_t *data, uint32_t length) {
-    uint16_t samplesLength = length/4;
+void callbackAppendSamples(const uint8_t *data, uint32_t length) {
+    length = length/4;
     auto frame = (Frame*)data;
-    for (int i = 0; i < samplesLength && fftData.samples.fullness < SAMPLES_SIZE; i++) {
-        fftData.samples.left[fftData.samples.fullness] = frame[i].channel1;
-        fftData.samples.right[fftData.samples.fullness] = frame[i].channel2;
-        fftData.samples.fullness++;
+    Samples &samples = fftData.samples;
+
+    if (length == SAMPLES_SIZE) samples.fullness = 0;
+
+    if (samples.fullness + length > SAMPLES_SIZE && length < SAMPLES_SIZE) {
+        uint16_t countOfOutOfBounds =  samples.fullness + length - SAMPLES_SIZE;
+        // Offset of the samples array by countOfOutOfBounds
+        for (uint16_t i = countOfOutOfBounds; i < SAMPLES_SIZE; i++) {
+            samples.left[i - countOfOutOfBounds] = samples.left[i];
+            samples.right[i - countOfOutOfBounds] = samples.right[i];
+        }
+        // The new full value of the samples array.
+        samples.fullness -= countOfOutOfBounds;
+    }
+
+    // Filling the array with new samples
+    if (SAMPLES_SIZE >= length) {
+        for (uint32_t i = 0; i < length; ++i) {
+            samples.left[samples.fullness] = frame[i].channel1;
+            samples.right[samples.fullness++] = frame[i].channel2;
+        }
+    } else {
+        for (samples.fullness = 0; samples.fullness < SAMPLES_SIZE; samples.fullness++) {
+            samples.left[SAMPLES_SIZE - 1 - samples.fullness] = frame[length - 1 - samples.fullness].channel1;
+            samples.right[SAMPLES_SIZE - 1 - samples.fullness] = frame[length - 1 - samples.fullness].channel2;
+        }
     }
 }
 
