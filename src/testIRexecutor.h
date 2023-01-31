@@ -15,15 +15,15 @@ void execIrCommandTest() {
         case ON_BUTTON:     colorModes.mode = COLOR_MUSIC_MODE;     break;
         case RED_BUTTON:
             Serial.println("LIN EXIT");
-            fftData.sendType = LIN;
+            fftData.amplitudesType = LIN;
             break;
         case GREEN_BUTTON:
             Serial.println("BARK EXIT");
-            fftData.sendType = BARK;
+            fftData.amplitudesType = BARK;
             break;
         case BLUE_BUTTON:
             Serial.println("LOG EXIT");
-            fftData.sendType = LOG;
+            fftData.amplitudesType = LOG;
             break;
         case WHITE_BUTTON:
             Serial.println("WINDOW EXIT");

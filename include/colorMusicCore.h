@@ -8,6 +8,11 @@
 #include "cmath"
 #include "BluetoothA2DPSink.h"
 
+
+enum AmplitudesType : uint8_t {
+    LIN, BARK, LOG
+};
+
 struct Samples {
     int16_t left[SAMPLES_SIZE];
     int16_t right[SAMPLES_SIZE];
@@ -30,7 +35,7 @@ struct FFTData {
     float fftWindow[SAMPLES_SIZE] __attribute__((aligned(16)));
     float buffer[SAMPLES_SIZE * 2] __attribute__((aligned(16)));
     bool useWindow;
-    uint8_t sendType;
+    AmplitudesType amplitudesType;
     float frequencyStep;
 };
 
@@ -55,11 +60,12 @@ void calculateAmplitudes(const int16_t *samples, float *amplitudes) {
     float temp;
     for (int i = 0 ; i < AMPLITUDES_SIZE ; i++) {
         temp = buffer[i * 2 + 0] * buffer[i * 2 + 0] + buffer[i * 2 + 1] * buffer[i * 2 + 1];
-        if (fftData.sendType == LIN || fftData.sendType == BARK)
+        if (fftData.amplitudesType == LIN || fftData.amplitudesType == BARK)
             amplitudes[i] = 2 * sqrtf(temp)/SAMPLES_SIZE;
-        switch (fftData.sendType) {
-            case BARK:  amplitudes[i] *= fftData.barkScale[i];          break;
+        switch (fftData.amplitudesType) {
             case LOG:   amplitudes[i] = 10 * log10f(temp/SAMPLES_SIZE); break;
+            case BARK:  amplitudes[i] *= fftData.barkScale[i];          break;
+            default:                                                    break;
         }
         if (amplitudes[i] > 32767) amplitudes[i] = 32767;
         if (amplitudes[i] < 0 || isinf(amplitudes[i]) || isnan(amplitudes[i])) amplitudes[i] = 0;
@@ -76,6 +82,7 @@ void generateBarkScaleTable(FFTData &fft) {
 //    for (int i = 1; i < AMPLITUDES_SIZE; i++) fft.barkScale[i] /= fft.barkScale[AMPLITUDES_SIZE-1];
 }
 
+
 void generateCustomBarkScaleTable(FFTData &fft) {
     float base;
     for (int i = 0; i < AMPLITUDES_SIZE; i++) {
@@ -88,8 +95,7 @@ void generateCustomBarkScaleTable(FFTData &fft) {
 void setupColorMusic(FFTData &fft) {
     fft.samples.fullness = 0;
     fft.useWindow = true;
-    fft.sendType = BARK;
-    fft.frequencyStep = 1/((float)SAMPLES_SIZE/44100);
+    fft.amplitudesType = BARK;
     dsps_wind_flat_top_f32(fft.fftWindow, SAMPLES_SIZE);
 //    dsps_wind_hann_f32(fft.fftWindow, SAMPLES_SIZE);
     dsps_fft2r_init_fc32(nullptr, SAMPLES_SIZE);
