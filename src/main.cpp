@@ -70,7 +70,7 @@ uint8_t sendType = AMPLITUDES_AREA;
 
 uint32_t timeFullness = 0;
 bool useDivision = false;
-int16_t info[5];
+uint32_t info[5];
 
 #include "colorMusic.h"
 #include "testIRexecutor.h"
@@ -78,14 +78,14 @@ int16_t info[5];
 
 void colorMusic() {
     if (fftData.samples.fullness != SAMPLES_SIZE) return;
-    info[4] = (int16_t) (millis() - timeFullness);
+    info[4] = millis() - timeFullness;
     timeFullness = millis();
 //    sendJsonArray(fftData.samples.left, 256, "samples");
 
-    uint16_t calcTime = millis();
+    uint32_t calcTime = millis();
     calculateAmplitudes(fftData.samples.right, fftData.amplitudes.right);
     calculateAmplitudes(fftData.samples.left, fftData.amplitudes.left);
-    info[0] = (int16_t) (millis() - calcTime);
+    info[0] = millis() - calcTime;
 //    Serial.println("Calc time (ms): " + String(info[0]));
 
     for (int i = 0; i < AMPLITUDES_SIZE; ++i) {
@@ -114,7 +114,7 @@ void colorMusic() {
             break;
         default: break;
     }
-    info[2] = (int16_t) (millis() - calcTime);
+    info[2] = millis() - calcTime;
     info[3] = fftArea;
     sendJsonArray(info, 5, "info");
 }
