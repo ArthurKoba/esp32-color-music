@@ -5,7 +5,6 @@ CRGB leds[NUM_LEDS];
 ColorModes colorModes;
 BluetoothA2DPSink a2dp_sink;
 
-uint16_t timeFullness = 0;
 
 void callbackChangeConnectionState(esp_a2d_connection_state_t state, void *obj) {
     Serial.println("Change connection state: " + String(state));
@@ -14,7 +13,6 @@ void callbackChangeConnectionState(esp_a2d_connection_state_t state, void *obj) 
         Serial.print(a2dp_sink.get_connected_source_name());
         Serial.println();
     }
-
 }
 
 void callbackAVRCMetadata(uint8_t param, const uint8_t *text, int length) {
@@ -23,7 +21,6 @@ void callbackAVRCMetadata(uint8_t param, const uint8_t *text, int length) {
     Serial.println();
     for (auto & led : leds) led = CRGB::Black;
     fftData.samples.fullness = 0;
-    timeFullness = millis();
 }
 
 void callbackOnChangeAudioState(esp_a2d_audio_state_t state, void *obj) {
