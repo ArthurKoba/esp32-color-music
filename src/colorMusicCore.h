@@ -63,7 +63,7 @@ private:
     uint16_t samplesFullness;
     TaskHandle_t fftTask = nullptr;
     TaskHandle_t colorsTask = nullptr;
-    AmplitudesType amplitudesType = LIN;
+    AmplitudesType amplitudesType = BARK;
     float frequencyStep = 0;
 //    bool useWindow;
 };
