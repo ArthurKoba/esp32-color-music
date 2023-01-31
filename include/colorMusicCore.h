@@ -24,10 +24,6 @@ struct Amplitudes {
     float right[AMPLITUDES_SIZE];
 };
 
-enum SEND_TYPE {
-    LIN, BARK, LOG, WINDOW, BARK_SCALE, OFF_SHOW
-};
-
 struct FFTData {
     Samples samples;
     Amplitudes amplitudes;

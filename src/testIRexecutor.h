@@ -27,7 +27,7 @@ void execIrCommandTest() {
             break;
         case WHITE_BUTTON:
             Serial.println("WINDOW EXIT");
-            fftData.sendType = WINDOW;
+            sendType = WINDOW;
             break;
         case 8:
             Serial.println("AREA 1-256");
@@ -71,19 +71,19 @@ void execIrCommandTest() {
             break;
         case 18:
             Serial.println("BARK EXIT");
-            fftData.sendType = BARK_SCALE;
+            sendType = BARK_SCALE;
             break;
         case FADE_BUTTON:
             Serial.println("OFF SHOW");
-            fftData.sendType = OFF_SHOW;
+            sendType = NO_SEND;
             break;
         case 20:
             Serial.println("SEND FULL AMPL TRUE");
-            sendFullAmplitudes = true;
+            sendType = AMPLITUDES_FULL;
             break;
         case 21:
             Serial.println("SEND FULL AMPL FALSE");
-            sendFullAmplitudes = false;
+            sendType = AMPLITUDES_AREA;
             break;
         case 22:
             Serial.println("USE DIVISION");

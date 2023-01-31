@@ -60,10 +60,15 @@ void setup() {
     Serial.println(" Started!");
 }
 
+enum SendType : uint8_t {
+    AMPLITUDES_AREA, AMPLITUDES_FULL, WINDOW, BARK_SCALE, NO_SEND
+};
 
 uint8_t fftArea = 0;
 uint8_t fastAmplitudes[AMPLITUDES_SIZE];
-uint8_t sendFullAmplitudes = false;
+uint8_t sendType = AMPLITUDES_AREA;
+
+uint32_t timeFullness = 0;
 bool useDivision = false;
 int16_t info[5];
 
@@ -94,20 +99,20 @@ void colorMusic() {
     info[1] = (int16_t) (millis() - calcTime);
 
     calcTime = millis();
-    switch (fftData.sendType) {
-        case OFF_SHOW: break;
+    switch (sendType) {
+        case AMPLITUDES_AREA:
+            sendAmplitudesArea(fastAmplitudes, AMPLITUDES_SIZE, "fft", fftArea);
+            break;
+        case AMPLITUDES_FULL:
+            sendJsonArray(fastAmplitudes, AMPLITUDES_SIZE, "fft");
+            break;
         case WINDOW:
             sendJsonArray(fftData.fftWindow, SAMPLES_SIZE, "window");
             break;
         case BARK_SCALE:
             sendJsonArray(fftData.barkScale, AMPLITUDES_SIZE, "bark");
             break;
-        default:
-            if (sendFullAmplitudes) {
-                sendJsonArray(fastAmplitudes, AMPLITUDES_SIZE, "fft");
-            } else {
-                sendAmplitudesArea(fastAmplitudes, AMPLITUDES_SIZE, "fft", fftArea);
-            }
+        default: break;
     }
     info[2] = (int16_t) (millis() - calcTime);
     info[3] = fftArea;
