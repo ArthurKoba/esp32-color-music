@@ -31,9 +31,6 @@ void callbackOnChangeAudioState(esp_a2d_audio_state_t state, void *obj) {
     FastLED.showColor(CRGB::Black);
 }
 
-void callbackSampleRate(uint16_t sampleRate) {
-    Serial.println("Sample rate: " + String(sampleRate));
-}
 
 void setup() {
     Serial.begin(SERIAL_SPEED);

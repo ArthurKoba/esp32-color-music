@@ -87,6 +87,15 @@ void generateCustomBarkScaleTable(FFTData &fft) {
     }
 }
 
+void callbackSampleRate(uint16_t sampleRate) {
+    Serial.println("Sample rate: " + String(sampleRate));
+    float frequencyStep = 1/((float) SAMPLES_SIZE/ (float) sampleRate);
+    Serial.println("frequencyStep: " + String(frequencyStep));
+    if (frequencyStep != fftData.frequencyStep) {
+//        generateCustomBarkScaleTable(fftData);
+        generateBarkScaleTable(fftData);
+    }
+}
 
 void setupColorMusic(FFTData &fft) {
     fft.samples.fullness = 0;
@@ -95,8 +104,6 @@ void setupColorMusic(FFTData &fft) {
     dsps_wind_flat_top_f32(fft.fftWindow, SAMPLES_SIZE);
 //    dsps_wind_hann_f32(fft.fftWindow, SAMPLES_SIZE);
     dsps_fft2r_init_fc32(nullptr, SAMPLES_SIZE);
-//    generateCustomBarkScaleTable(fft);
-    generateBarkScaleTable(fft);
 }
 
 
