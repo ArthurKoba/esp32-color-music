@@ -73,9 +73,6 @@ private:
     float frequencyStep = 0.0;
     TaskHandle_t fftTask = nullptr;
     TaskHandle_t colorsTask = nullptr;
-    AmplitudesType amplitudesType = BARK;
-    float frequencyStep = 0;
-//    bool useWindow;
 };
 
 #endif //ESP32_COLOR_MUSIC_COLORMUSICCORE_H
