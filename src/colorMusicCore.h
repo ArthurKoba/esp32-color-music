@@ -18,7 +18,7 @@
 #include "cmath"
 
 enum AmplitudesType : uint8_t {
-    LIN, BARK, LOG
+    LIN, LOG, BARK, CUSTOM_BARK
 };
 
 
@@ -53,6 +53,7 @@ private:
     void addSamples(const uint8_t*, uint32_t);
     void calcFFT(const int16_t *, float *);
     void generateBarkScaleTable();
+    void generateCustomBarkScaleTable();
 
     Samples *samples;
     Amplitudes *amplitudes;

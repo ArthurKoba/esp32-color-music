@@ -111,6 +111,16 @@ void ColorMusic::generateBarkScaleTable() {
     }
 }
 
+void ColorMusic::generateCustomBarkScaleTable() {
+    printf("generate custom bark scale\n");
+    if (barkScale == nullptr) barkScale = new float[AMPLITUDES_SIZE];
+    float base;
+    for (int i = 0; i < AMPLITUDES_SIZE; i++) {
+        base = (float) i * (frequencyStep/3000);
+        barkScale[i] = logf(base + sqrtf(1 + base * base));
+    }
+}
+
 void ColorMusic::setAmplitudesType(AmplitudesType value) {
     // todo block repeat delete barkScale
     if (amplitudesType != value && value == BARK) generateBarkScaleTable();
