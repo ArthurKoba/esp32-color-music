@@ -7,28 +7,27 @@ CRGB leds[NUM_LEDS];
 BluetoothA2DPSink a2dp_sink;
 ColorMusic colorMusic(leds);
 
+void callbackChangeConnectionState(esp_a2d_connection_state_t state, void *obj) {
+    Serial.println("Change connection state: " + String(state));
+    if (state == ESP_A2D_CONNECTION_STATE_CONNECTED) {
+        Serial.print("Connected host: ");
+        Serial.print(a2dp_sink.get_connected_source_name());
+        Serial.println();
+    }
+}
 
-//void callbackChangeConnectionState(esp_a2d_connection_state_t state, void *obj) {
-//    Serial.println("Change connection state: " + String(state));
-//    if (state == ESP_A2D_CONNECTION_STATE_CONNECTED) {
-//        Serial.print("Connected host: ");
-//        Serial.print(a2dp_sink.get_connected_source_name());
-//        Serial.println();
-//    }
-//}
-//
-//void callbackAVRCMetadata(uint8_t param, const uint8_t *text, int length) {
-//    Serial.print("AVRCMetadata: " + String(param) + " ");
-//    Serial.write(text, length);
-//    Serial.println();
-//    for (auto & led : leds) led = CRGB::Black;
-//    fftData.samples.fullness = 0;
-//}
-//
-//void callbackOnChangeAudioState(esp_a2d_audio_state_t state, void *obj) {
-//    Serial.println("Change audio state!");
-//    FastLED.showColor(CRGB::Black);
-//}
+void callbackAVRCMetadata(uint8_t param, const uint8_t *text) {
+    Serial.print("AVRCMetadata: " + String(param) + " ");
+    Serial.write((char*)&text, strlen((char*)&text));
+    Serial.println();
+    for (auto & led : leds) led = CRGB::Black;
+    colorMusic.samplesFullness = 0;
+}
+
+void callbackOnChangeAudioState(esp_a2d_audio_state_t state, void *obj) {
+    Serial.println("Change audio state!");
+    FastLED.showColor(CRGB::Black);
+}
 
 
 void setup() {
@@ -43,14 +42,13 @@ void setup() {
     a2dp_sink.set_raw_stream_reader(ColorMusic::callbackAddSamples);
     a2dp_sink.set_sample_rate_callback(ColorMusic::callbackUpdateSampleRate);
     a2dp_sink.set_volume(127);
-//    a2dp_sink.set_on_volumechange(change_volume);
-//    a2dp_sink.set_on_audio_state_changed_post(callbackOnChangeAudioState);
-//    a2dp_sink.set_on_connection_state_changed(callbackChangeConnectionState);
-//    a2dp_sink.set_avrc_metadata_callback(callbackAVRCMetadata);
+    a2dp_sink.set_on_volumechange(change_volume);
+    a2dp_sink.set_on_audio_state_changed_post(callbackOnChangeAudioState);
+    a2dp_sink.set_on_connection_state_changed(callbackChangeConnectionState);
+    a2dp_sink.set_avrc_metadata_callback(callbackAVRCMetadata);
 //    a2dp_sink.set_task_core(0);
     a2dp_sink.start(BLUETOOTH_DEVICE_NAME);
-
-//    setupEncoder();
+    setupEncoder();
     IrReceiver.begin(IR_RECEIVE_PIN);
 //    setupColorMusic(fftData);
     Serial.print('\n');
@@ -63,7 +61,6 @@ enum SendType : uint8_t {
 };
 
 uint8_t fftArea = 0;
-uint8_t fastAmplitudes[AMPLITUDES_SIZE];
 uint8_t sendType = AMPLITUDES_AREA;
 bool useDivision = false;
 uint32_t info[5];
@@ -113,7 +110,7 @@ uint32_t info[5];
 
 
 void loop() {
-//    execEncoder(a2dp_sink);
+    execEncoder(a2dp_sink);
 ////    execIrCommand(colorModes);
     execIrCommandTest(colorMusic);
 //    switch (colorModes.mode) {
