@@ -22,6 +22,11 @@ enum AmplitudesType : uint8_t {
 };
 
 
+enum WindowType : uint8_t {
+    NO_WINDOW, BLACKMAN, BLACKMAN_HARRIS, BLACKMAN_NUTTALL, FLAT_TOP, HANN, NUTTALL
+};
+
+
 struct Samples {
     int16_t left[SAMPLES_SIZE];
     int16_t right[SAMPLES_SIZE];
@@ -43,6 +48,7 @@ public:
     void static callbackUpdateSampleRate(uint16_t);
     void setAmplitudesType(AmplitudesType);
     void setSampleRate(uint16_t);
+    void setWindow(WindowType);
     CRGB *leds = nullptr;
     uint8_t *fastAmplitudes;
 
@@ -58,10 +64,13 @@ private:
     Samples *samples;
     Amplitudes *amplitudes;
 
-    //    float fftWindow[SAMPLES_SIZE] __attribute__((aligned(16))); // todo dynamic memory
+    float fftWindow[SAMPLES_SIZE] __attribute__((aligned(16))); // todo dynamic memory
     float buffer[SAMPLES_SIZE * 2] __attribute__((aligned(16))); // todo dynamic memory
     float *barkScale = nullptr;
-    uint16_t samplesFullness;
+    uint16_t samplesFullness = 0;
+    AmplitudesType amplitudesType = BARK;
+    WindowType windowType = NO_WINDOW;
+    float frequencyStep = 0.0;
     TaskHandle_t fftTask = nullptr;
     TaskHandle_t colorsTask = nullptr;
     AmplitudesType amplitudesType = BARK;

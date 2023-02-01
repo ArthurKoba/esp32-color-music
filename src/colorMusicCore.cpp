@@ -68,10 +68,10 @@ void ColorMusic::addSamples(const uint8_t *data, uint32_t length) {
 
 void ColorMusic::calcFFT(const int16_t *targetSamples, float *targetAmplitudes) {
     for (int i = 0; i < SAMPLES_SIZE; i++) {
-//        if (useWindow)
-//            buffer[i * 2 + 0] = (float) targetSamples[i] * fftData.fftWindow[i];
-//        else
-        buffer[i * 2 + 0] = (float) targetSamples[i];
+        if (windowType != NO_WINDOW)
+            buffer[i * 2 + 0] = (float) targetSamples[i] * fftWindow[i];
+        else
+            buffer[i * 2 + 0] = (float) targetSamples[i];
         buffer[i * 2 + 1] = 0;
     }
 
@@ -137,6 +137,32 @@ void ColorMusic::setSampleRate(uint16_t newSampleRate) {
     if (newFrequencyStep != frequencyStep && amplitudesType == BARK) generateBarkScaleTable();
     frequencyStep = newFrequencyStep;
     printf("set frequencyStep: %f \n", frequencyStep);
+}
+
+void ColorMusic::setWindow(WindowType newWindowType) {
+    if (this->windowType == newWindowType) return;
+    switch (newWindowType) {
+        case NO_WINDOW:
+            break;
+        case BLACKMAN:
+            dsps_wind_blackman_f32(fftWindow, SAMPLES_SIZE);
+            break;
+        case BLACKMAN_HARRIS:
+            dsps_wind_blackman_harris_f32(fftWindow, SAMPLES_SIZE);
+            break;
+        case BLACKMAN_NUTTALL:
+            dsps_wind_blackman_nuttall_f32(fftWindow, SAMPLES_SIZE);
+            break;
+        case FLAT_TOP:
+            dsps_wind_flat_top_f32(fftWindow, SAMPLES_SIZE);
+            break;
+        case HANN:
+            dsps_wind_hann_f32(fftWindow, SAMPLES_SIZE);
+            break;
+        case NUTTALL:
+            dsps_wind_nuttall_f32(fftWindow, SAMPLES_SIZE);
+            break;
+    }
 }
 
 [[noreturn]] void ColorMusic::fftExecutor(void *pvParam) {
