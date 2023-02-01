@@ -20,7 +20,6 @@ ColorMusic::ColorMusic(CRGB *leds) {
     setWindowType(FLAT_TOP);
 
 //  todo find optimal stack depth and cores. configMINIMAL_STACK_SIZE - not enough, 2048 - there may be many
-    printf("minimal stack depth: %u\n", configMINIMAL_STACK_SIZE);
     xTaskCreate(ColorMusic::fftExecutor, "colorMusicFFT", 2048, nullptr, 10, &fftTask);
     xTaskCreate(ColorMusic::colorsExecutor, "colorMusicColorsExecutor", 2048, nullptr, 8, &colorsTask);
     xTaskCreate(ColorMusic::sendExecutor, "colorMusicSendExecutor", 2048, nullptr, 8, &sendTask);
@@ -40,7 +39,7 @@ ColorMusic::~ColorMusic() {
 
 
 void ColorMusic::addSamples(const uint8_t *data, uint32_t length) {
-    printf("[%lu] addSamples | new samples\n", millis());
+//    printf("[%lu] addSamples | new samples\n", millis());
     length = length/4;
     auto frame = (Frame*)data;
 
@@ -272,19 +271,6 @@ void ColorMusic::callbackAddSamples(const uint8_t *data, uint32_t length) {
 void ColorMusic::callbackUpdateSampleRate(uint16_t newSampleRate) {
     if (actualColorMusic != nullptr) actualColorMusic->setSampleRate(newSampleRate);
 }
-
-
-
-
-
-//void generateCustomBarkScaleTable(FFTData &fft) {
-//    float base;
-//    for (int i = 0; i < AMPLITUDES_SIZE; i++) {
-//        base = (float) i * (fft.frequencyStep/3000);
-//        fft.barkScale[i] = logf(base + sqrtf(1 + base * base));
-//    }
-//}
-//
 
 //int32_t getAmplitudeSignal(const int16_t *samples) {
 //    int16_t minValue = 0;
