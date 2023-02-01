@@ -131,14 +131,14 @@ void ColorMusic::setAmplitudesType(AmplitudesType value) {
 void ColorMusic::setSampleRate(uint16_t newSampleRate) {
     printf("sample rate new: %u \n", newSampleRate);
     float newFrequencyStep = 1/((float) SAMPLES_SIZE/ (float) newSampleRate);
-    if (newFrequencyStep != frequencyStep && amplitudesType == BARK) generateBarkScaleTable();
     frequencyStep = newFrequencyStep;
     printf("set frequencyStep: %f \n", frequencyStep);
     if (newFrequencyStep != frequencyStep) generateBarkScaleTable();
 }
 
-void ColorMusic::setWindow(WindowType newWindowType) {
-    if (this->windowType == newWindowType) return;
+void ColorMusic::setWindowType(WindowType newWindowType) {
+    if (windowType == newWindowType) return;
+    windowType = newWindowType;
     switch (newWindowType) {
         case NO_WINDOW:
             break;
