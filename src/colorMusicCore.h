@@ -48,7 +48,7 @@ public:
     void static callbackUpdateSampleRate(uint16_t);
     void setAmplitudesType(AmplitudesType);
     void setSampleRate(uint16_t);
-    void setWindow(WindowType);
+    void setWindowType(WindowType);
     CRGB *leds = nullptr;
     uint8_t *fastAmplitudes;
 

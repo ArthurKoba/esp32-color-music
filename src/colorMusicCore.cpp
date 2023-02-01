@@ -16,6 +16,7 @@ ColorMusic::ColorMusic(CRGB *leds) {
 
     dsps_fft2r_init_fc32(nullptr, SAMPLES_SIZE); // todo do free memory
     setAmplitudesType(amplitudesType);
+    setWindowType(FLAT_TOP);
 
 //  todo find optimal stack depth and cores. configMINIMAL_STACK_SIZE - not enough, 2048 - there may be many
     printf("minimal stack depth: %u\n", configMINIMAL_STACK_SIZE);
