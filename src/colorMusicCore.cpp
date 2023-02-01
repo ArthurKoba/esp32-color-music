@@ -3,6 +3,7 @@
 //
 
 #include "colorMusicCore.h"
+#include "serialPortInteraction.h"
 
 ColorMusic *actualColorMusic = nullptr;
 
@@ -22,6 +23,7 @@ ColorMusic::ColorMusic(CRGB *leds) {
     printf("minimal stack depth: %u\n", configMINIMAL_STACK_SIZE);
     xTaskCreate(ColorMusic::fftExecutor, "colorMusicFFT", 2048, nullptr, 10, &fftTask);
     xTaskCreate(ColorMusic::colorsExecutor, "colorMusicColorsExecutor", 2048, nullptr, 8, &colorsTask);
+    xTaskCreate(ColorMusic::sendExecutor, "colorMusicSendExecutor", 2048, nullptr, 8, &sendTask);
 }
 
 ColorMusic::~ColorMusic() {
@@ -30,7 +32,10 @@ ColorMusic::~ColorMusic() {
     delete amplitudes;
     delete fastAmplitudes;
     delete barkScale;
+    dsps_fft2r_deinit_fc32();
     vTaskDelete(&fftTask);
+    vTaskDelete(&colorsTask);
+    vTaskDelete(&sendTask);
 }
 
 
@@ -163,10 +168,10 @@ void ColorMusic::setWindow(WindowType newWindowType) {
     while (true) {
         if (xTaskNotifyWait(0, 0, 0, portMAX_DELAY) != pdPASS) continue;
         if (actualColorMusic == nullptr) continue;
-        printf("[%lu] fftExecutor | start calculating fft\n", millis());
+//        printf("[%lu] fftExecutor | start calculating fft\n", millis());
         actualColorMusic->calcFFT(actualColorMusic->samples->left, actualColorMusic->amplitudes->left);
         actualColorMusic->calcFFT(actualColorMusic->samples->right, actualColorMusic->amplitudes->right);
-        printf("[%lu] fftExecutor | end calculating fft\n", millis());
+//        printf("[%lu] fftExecutor | end calculating fft\n", millis());
         xTaskNotify(actualColorMusic->colorsTask, 0, eNoAction); // todo execute result
     }
 }
@@ -234,13 +239,29 @@ void calculateColors(const uint8_t *amplitudes, CRGB *leds, float freqStep) {
     while (true) {
         if (xTaskNotifyWait(0, 0, 0, portMAX_DELAY) != pdPASS) continue;
         if (actualColorMusic == nullptr) continue;
-        printf("[%lu] colorsExecutor | get notification fft\n", millis());
+//        printf("[%lu] colorsExecutor | get notification fft\n", millis());
         for (int i = 0; i < AMPLITUDES_SIZE; ++i) {
             actualColorMusic->fastAmplitudes[i] = ((int16_t) actualColorMusic->amplitudes->left[i]) >> 6;
         }
-        printf("[%lu] colorsExecutor | start calc colors and show\n", millis());
+        xTaskNotify(actualColorMusic->sendTask, 0, eNoAction); // todo execute result
+//        printf("[%lu] colorsExecutor | start calc colors and show\n", millis());
         calculateColors(actualColorMusic->fastAmplitudes, actualColorMusic->leds, actualColorMusic->frequencyStep);
-        printf("[%lu] colorsExecutor | end calc colors and show\n", millis());
+//        printf("[%lu] colorsExecutor | end calc colors and show\n", millis());
+    }
+}
+
+void ColorMusic::sendExecutor(void *) {
+    bool needSend;
+    while (true) {
+        needSend = false;
+        if (xTaskNotifyWait(0, 0, 0, portMAX_DELAY) != pdPASS) continue;
+        if (actualColorMusic == nullptr) continue;
+
+
+        for (float amplitude : actualColorMusic->amplitudes->left) if (amplitude != 0.0) needSend = true;
+//        printf("-[%lu]\n", millis());
+//        if (needSend) sendJsonArray(actualColorMusic->amplitudes->left, 512, "fft");
+
     }
 }
 

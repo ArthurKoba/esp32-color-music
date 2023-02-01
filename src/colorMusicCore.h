@@ -7,7 +7,7 @@
 
 
 #ifndef SAMPLES_SIZE
-#define SAMPLES_SIZE 2048
+    #define SAMPLES_SIZE 2048
 #endif
 
 #define AMPLITUDES_SIZE SAMPLES_SIZE / 2
@@ -55,6 +55,7 @@ public:
 private:
     [[noreturn]] void static fftExecutor(void*);
     [[noreturn]] void static colorsExecutor(void*); // todo rename to normal
+    [[noreturn]] void static sendExecutor(void*);
 
     void addSamples(const uint8_t*, uint32_t);
     void calcFFT(const int16_t *, float *);
@@ -66,13 +67,14 @@ private:
 
     float fftWindow[SAMPLES_SIZE] __attribute__((aligned(16))); // todo dynamic memory
     float buffer[SAMPLES_SIZE * 2] __attribute__((aligned(16))); // todo dynamic memory
-    float *barkScale = nullptr;
-    uint16_t samplesFullness = 0;
+    float *barkScale;
     AmplitudesType amplitudesType = BARK;
     WindowType windowType = NO_WINDOW;
     float frequencyStep = 0.0;
     TaskHandle_t fftTask = nullptr;
     TaskHandle_t colorsTask = nullptr;
+    TaskHandle_t sendTask = nullptr;
 };
+
 
 #endif //ESP32_COLOR_MUSIC_COLORMUSICCORE_H
