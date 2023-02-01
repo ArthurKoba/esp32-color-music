@@ -12,8 +12,8 @@ ColorMusic::ColorMusic(CRGB *leds) {
     samplesFullness = 0;
     samples = new Samples;
     amplitudes = new Amplitudes;
-    fastAmplitudes = new uint8_t[AMPLITUDES_SIZE];
-
+    barkScale = new float[AMPLITUDES_SIZE]; // todo do free memory
+    fastAmplitudes = new uint8_t[AMPLITUDES_SIZE]; // todo do free memory
     dsps_fft2r_init_fc32(nullptr, SAMPLES_SIZE); // todo do free memory
     setAmplitudesType(amplitudesType);
     setWindowType(FLAT_TOP);
@@ -87,7 +87,6 @@ void ColorMusic::calcFFT(const int16_t *targetSamples, float *targetAmplitudes) 
             targetAmplitudes[i] = 2 * sqrtf(temp)/SAMPLES_SIZE;
         switch(amplitudesType) {
             case BARK:
-                if (barkScale == nullptr) generateBarkScaleTable();
                 targetAmplitudes[i] *= barkScale[i];
                 break;
             case LOG:
@@ -104,7 +103,6 @@ void ColorMusic::calcFFT(const int16_t *targetSamples, float *targetAmplitudes) 
 
 void ColorMusic::generateBarkScaleTable() {
     printf("generate bark scale\n");
-    if (barkScale == nullptr) barkScale = new float[AMPLITUDES_SIZE];
     float base;
     for (int i = 0; i < AMPLITUDES_SIZE; i++) {
         base = (float) i * (frequencyStep/650);
@@ -114,7 +112,6 @@ void ColorMusic::generateBarkScaleTable() {
 
 void ColorMusic::generateCustomBarkScaleTable() {
     printf("generate custom bark scale\n");
-    if (barkScale == nullptr) barkScale = new float[AMPLITUDES_SIZE];
     float base;
     for (int i = 0; i < AMPLITUDES_SIZE; i++) {
         base = (float) i * (frequencyStep/3000);
@@ -123,12 +120,7 @@ void ColorMusic::generateCustomBarkScaleTable() {
 }
 
 void ColorMusic::setAmplitudesType(AmplitudesType value) {
-    // todo block repeat delete barkScale
-    if (amplitudesType != value && value == BARK) generateBarkScaleTable();
-    if (value != BARK && barkScale != nullptr) {
-        printf("delete bark scale!\n");
-        delete barkScale;
-    }
+    if (value == BARK) generateBarkScaleTable();
     amplitudesType = value;
 }
 
@@ -138,6 +130,7 @@ void ColorMusic::setSampleRate(uint16_t newSampleRate) {
     if (newFrequencyStep != frequencyStep && amplitudesType == BARK) generateBarkScaleTable();
     frequencyStep = newFrequencyStep;
     printf("set frequencyStep: %f \n", frequencyStep);
+    if (newFrequencyStep != frequencyStep) generateBarkScaleTable();
 }
 
 void ColorMusic::setWindow(WindowType newWindowType) {
