@@ -46,7 +46,7 @@ void setColor(uint8_t ledId)
         case YELLOW_BUTTON:     FastLED.showColor(CRGB(255, 150,   0)); break;
         case NAVY_BUTTON:       FastLED.showColor(CRGB( 100,  0, 141)); break;
         case PINK_BUTTON:       FastLED.showColor(CRGB(211,  40, 158)); break;
-        default:                                                                       break;
+        default:                                                                        break;
     }
 }
 
