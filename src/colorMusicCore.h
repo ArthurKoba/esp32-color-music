@@ -51,6 +51,7 @@ public:
     void setWindowType(WindowType);
     CRGB *leds = nullptr;
     uint8_t *fastAmplitudes;
+    uint16_t samplesFullness = 0;
 
 private:
     [[noreturn]] void static fftExecutor(void*);
