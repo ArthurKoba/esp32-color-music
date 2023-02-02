@@ -3,7 +3,6 @@
 //
 
 #include "colorMusicCore.h"
-#include "serialPortInteraction.h"
 
 ColorMusic *actualColorMusic = nullptr;
 
@@ -106,7 +105,7 @@ void ColorMusic::calcFFT(const int16_t *targetSamples, float *targetAmplitudes) 
 }
 
 void ColorMusic::generateBarkScaleTable() {
-    printf("generate bark scale\n");
+    Serial.println("generate bark scale");
     float base;
     for (int i = 0; i < AMPLITUDES_SIZE; i++) {
         base = (float) i * (frequencyStep/650);
@@ -115,7 +114,7 @@ void ColorMusic::generateBarkScaleTable() {
 }
 
 void ColorMusic::generateCustomBarkScaleTable() {
-    printf("generate custom bark scale\n");
+    Serial.println("generate custom bark scale");
     float base;
     for (int i = 0; i < AMPLITUDES_SIZE; i++) {
         base = (float) i * (frequencyStep/3000);
@@ -133,7 +132,7 @@ void ColorMusic::setSampleRate(uint16_t newSampleRate) {
     float newFrequencyStep = 1/((float) SAMPLES_SIZE/ (float) newSampleRate);
     frequencyStep = newFrequencyStep;
     printf("set frequencyStep: %f \n", frequencyStep);
-    if (newFrequencyStep != frequencyStep) generateBarkScaleTable();
+    generateBarkScaleTable();
 }
 
 void ColorMusic::setWindowType(WindowType newWindowType) {
@@ -187,7 +186,7 @@ void calculateColors(const uint8_t *amplitudes, CRGB *leds, float freqStep) {
     auto startHighIndex = (uint16_t) (10000/freqStep);
     auto endHighIndex = (uint16_t) (20000/freqStep);
 
-    low = amplitudes[5];
+    low = amplitudes[7];
 //    for (auto i = startLowIndex; i < endLowIndex; ++i) {
 //        if (amplitudes[i] > low) low = amplitudes[i];
 //    }

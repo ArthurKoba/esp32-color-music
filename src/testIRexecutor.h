@@ -5,16 +5,20 @@ void execIrCommandTest(ColorMusic &colorMusicObj) {
     uint16_t command = IrReceiver.decodedIRData.command;
     printf("IR command: %u\n", command);
     switch (command) {
-//        case 0:
+        case BRIGHT_UP_BUTTON:
 //            Serial.println("USE WINDOW TRUE");
 //            fftData.useWindow = true;
-//            break;
-//        case 1:
+            break;
+        case BRIGHT_DOWN_BUTTON:
 //            Serial.println("USE WINDOW FALSE");
 //            fftData.useWindow = false;
-//            break;
-//        case OFF_BUTTON:    colorModes.mode = COLOR_MODE;           break;
-//        case ON_BUTTON:     colorModes.mode = COLOR_MUSIC_MODE;     break;
+            break;
+        case OFF_BUTTON:
+//            colorModes.mode = COLOR_MODE;
+            break;
+        case ON_BUTTON:
+//            colorModes.mode = COLOR_MUSIC_MODE;
+            break;
         case RED_BUTTON:
             Serial.println("LIN EXIT");
             colorMusicObj.setAmplitudesType(LIN);
@@ -48,54 +52,45 @@ void execIrCommandTest(ColorMusic &colorMusicObj) {
 //            fftArea = 3;
 //            break;
 //        case 12:
-//            Serial.println("WINDOW dsps_wind_blackman_f32");
-//            dsps_wind_blackman_f32(fftData.fftWindow, SAMPLES_SIZE);
 //            break;
 //        case 13:
-//            Serial.println("WINDOW dsps_wind_blackman_harris_f32");
-//            dsps_wind_blackman_harris_f32(fftData.fftWindow, SAMPLES_SIZE);
 //            break;
 //        case 14:
-//            Serial.println("WINDOW dsps_wind_blackman_nuttall_f32");
-//            dsps_wind_blackman_nuttall_f32(fftData.fftWindow, SAMPLES_SIZE);
 //            break;
 //        case STROBE_BUTTON:
-//            Serial.println("WINDOW dsps_wind_flat_top_f32");
-//            dsps_wind_flat_top_f32(fftData.fftWindow, SAMPLES_SIZE);
+//
 //            break;
 //        case 16:
-//            Serial.println("WINDOW dsps_wind_hann_f32");
-//            dsps_wind_hann_f32(fftData.fftWindow, SAMPLES_SIZE);
+//
 //            break;
-//        case 17:
-//            Serial.println("WINDOW dsps_wind_nuttall_f32");
-//            dsps_wind_nuttall_f32(fftData.fftWindow, SAMPLES_SIZE);
-//            break;
-//        case 18:
-//            Serial.println("BARK EXIT");
-//            sendType = BARK_SCALE;
-//            break;
-//        case FADE_BUTTON:
-//            Serial.println("OFF SHOW");
-//            sendType = NO_SEND;
-//            break;
-//        case 20:
-//            Serial.println("SEND FULL AMPL TRUE");
-//            sendType = AMPLITUDES_FULL;
-//            break;
-//        case 21:
-//            Serial.println("SEND FULL AMPL FALSE");
-//            sendType = AMPLITUDES_AREA;
-//            break;
-//        case 22:
-//            Serial.println("USE DIVISION");
-//            useDivision = true;
-//            break;
-//        case SMOOTH_BUTTON:
-//            Serial.println("UN USE DIVISION");
-//            useDivision = false;
-//            break;
-
+        case 17:
+            printf("NO_WINDOW\n");
+            colorMusicObj.setWindowType(NO_WINDOW);
+            break;
+        case 18:
+            printf("WINDOW dsps_wind_blackman_f32\n");
+            colorMusicObj.setWindowType(BLACKMAN);
+            break;
+        case FADE_BUTTON:
+            printf("WINDOW dsps_wind_blackman_harris_f32\n");
+            colorMusicObj.setWindowType(BLACKMAN_HARRIS);
+            break;
+        case 20:
+            printf("WINDOW dsps_wind_blackman_nuttall_f32\n");
+            colorMusicObj.setWindowType(BLACKMAN_NUTTALL);
+            break;
+        case 21:
+            printf("WINDOW dsps_wind_flat_top_f32\n");
+            colorMusicObj.setWindowType(FLAT_TOP);
+            break;
+        case 22:
+            printf("WINDOW dsps_wind_hann_f32\n");
+            colorMusicObj.setWindowType(HANN);
+            break;
+        case SMOOTH_BUTTON:
+            printf("WINDOW dsps_wind_nuttall_f32\n");
+            colorMusicObj.setWindowType(NUTTALL);
+            break;
     }
     IrReceiver.resume();
 }

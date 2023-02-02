@@ -1,7 +1,3 @@
-//
-// Created by Koba on 31.01.2023.
-//
-
 #ifndef ESP32_COLOR_MUSIC_COLORMUSICCORE_H
 #define ESP32_COLOR_MUSIC_COLORMUSICCORE_H
 
@@ -16,6 +12,7 @@
 #include <FastLED.h>
 #include "esp_dsp.h"
 #include "cmath"
+
 
 enum AmplitudesType : uint8_t {
     LIN, LOG, BARK, CUSTOM_BARK
@@ -41,40 +38,40 @@ struct Amplitudes {
 
 class ColorMusic {
 public:
-    ColorMusic(CRGB*);
+    explicit ColorMusic(CRGB*);
     ~ColorMusic();
 
-    void setAmplitudesType(AmplitudesType);
-    void setSampleRate(uint16_t);
-    void setWindowType(WindowType);
+    void setAmplitudesType(AmplitudesType type);
+    void setSampleRate(uint16_t sampleRate);
+    void setWindowType(WindowType type);
+    void addSamples(const uint8_t *data, uint32_t length);
+
     CRGB *leds = nullptr;
     uint8_t *fastAmplitudes;
     uint16_t samplesFullness = 0;
 
-    void addSamples(const uint8_t*, uint32_t);
-
 private:
-    [[noreturn]] void static fftExecutor(void*);
-    [[noreturn]] void static colorsExecutor(void*); // todo rename to normal
-    [[noreturn]] void static sendExecutor(void*);
+    [[noreturn]] void static fftExecutor(void *pvParam);
+    [[noreturn]] void static colorsExecutor(void *pvParam); // todo rename to normal
+    [[noreturn]] void static sendExecutor(void *pvParam);
 
     void calcFFT(const int16_t *, float *);
     void generateBarkScaleTable();
     void generateCustomBarkScaleTable();
 
-    Samples *samples;
-    Amplitudes *amplitudes;
-
-    float fftWindow[SAMPLES_SIZE] __attribute__((aligned(16))); // todo dynamic memory
-    float buffer[SAMPLES_SIZE * 2] __attribute__((aligned(16))); // todo dynamic memory
-    float *barkScale;
-    AmplitudesType amplitudesType = BARK;
-    WindowType windowType = NO_WINDOW;
-    float frequencyStep = 0.0;
     TaskHandle_t fftTask = nullptr;
     TaskHandle_t colorsTask = nullptr;
     TaskHandle_t sendTask = nullptr;
-};
 
+    Samples *samples;
+    Amplitudes *amplitudes;
+    float *barkScale;
+    float fftWindow[SAMPLES_SIZE] __attribute__((aligned(16))); // todo dynamic memory
+    float buffer[SAMPLES_SIZE * 2] __attribute__((aligned(16))); // todo dynamic memory
+
+    AmplitudesType amplitudesType = BARK;
+    WindowType windowType = NO_WINDOW;
+    float frequencyStep = 0.0;
+};
 
 #endif //ESP32_COLOR_MUSIC_COLORMUSICCORE_H

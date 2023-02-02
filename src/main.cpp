@@ -16,10 +16,12 @@ void callbackChangeConnectionState(esp_a2d_connection_state_t state, void *obj) 
     }
 }
 
-void callbackAVRCMetadata(uint8_t param, const uint8_t *text) {
-    Serial.print("AVRCMetadata: " + String(param) + " ");
-    Serial.write((char*)&text, strlen((char*)&text));
-    Serial.println();
+void callbackAVRCMetadata(uint8_t id, const uint8_t *text) {
+//    Serial.print("AVRCMetadata: " + String(id));
+    printf("AVRCMetadata: id 0x%x, %s\n", id, text);
+////    Serial.write(text, strlen((char*)&text));
+//    Serial.write(text, strlen((char*)&text));
+//    Serial.println();
     for (auto & led : leds) led = CRGB::Black;
     colorMusic.samplesFullness = 0;
 }
