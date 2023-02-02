@@ -264,14 +264,6 @@ void ColorMusic::sendExecutor(void *) {
     }
 }
 
-void ColorMusic::callbackAddSamples(const uint8_t *data, uint32_t length) {
-    if (actualColorMusic != nullptr) actualColorMusic->addSamples(data, length);
-}
-
-void ColorMusic::callbackUpdateSampleRate(uint16_t newSampleRate) {
-    if (actualColorMusic != nullptr) actualColorMusic->setSampleRate(newSampleRate);
-}
-
 //int32_t getAmplitudeSignal(const int16_t *samples) {
 //    int16_t minValue = 0;
 //    int16_t maxValue = 0;

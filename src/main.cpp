@@ -39,8 +39,8 @@ void setup() {
 //    FastLED.setBrightness(colorModes.bright);
     FastLED.showColor(CRGB::Black);
     a2dp_sink.set_pin_config(i2sPins);
-    a2dp_sink.set_raw_stream_reader(ColorMusic::callbackAddSamples);
-    a2dp_sink.set_sample_rate_callback(ColorMusic::callbackUpdateSampleRate);
+    a2dp_sink.set_raw_stream_reader([] (const uint8_t *d, uint32_t l) {colorMusic.addSamples(d, l);});
+    a2dp_sink.set_sample_rate_callback([] (uint16_t rate) {colorMusic.setSampleRate(rate);});
     a2dp_sink.set_volume(127);
     a2dp_sink.set_on_volumechange(change_volume);
     a2dp_sink.set_on_audio_state_changed_post(callbackOnChangeAudioState);

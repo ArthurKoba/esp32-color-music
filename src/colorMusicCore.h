@@ -44,8 +44,6 @@ public:
     ColorMusic(CRGB*);
     ~ColorMusic();
 
-    void static callbackAddSamples(const uint8_t*, uint32_t);
-    void static callbackUpdateSampleRate(uint16_t);
     void setAmplitudesType(AmplitudesType);
     void setSampleRate(uint16_t);
     void setWindowType(WindowType);
@@ -53,12 +51,13 @@ public:
     uint8_t *fastAmplitudes;
     uint16_t samplesFullness = 0;
 
+    void addSamples(const uint8_t*, uint32_t);
+
 private:
     [[noreturn]] void static fftExecutor(void*);
     [[noreturn]] void static colorsExecutor(void*); // todo rename to normal
     [[noreturn]] void static sendExecutor(void*);
 
-    void addSamples(const uint8_t*, uint32_t);
     void calcFFT(const int16_t *, float *);
     void generateBarkScaleTable();
     void generateCustomBarkScaleTable();
