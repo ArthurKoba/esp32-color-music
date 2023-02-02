@@ -1,3 +1,6 @@
+#ifndef ESP32_COLOR_MUSIC_SERIALPORTINTERACTION_H
+#define ESP32_COLOR_MUSIC_SERIALPORTINTERACTION_H
+
 void sendDataType(String &dataType) {
   Serial.print(F("{\"dataType\":\""));
   Serial.print(dataType);
@@ -67,3 +70,5 @@ void sendAmplitudesArea(uint8_t *arr, const uint16_t arrSize, String dataType = 
 // void sendAmplitudes(FHTData &fhtData) {
 //   sendJsonArray(fhtData.amplitudes, fhtData.amplitudesLength, "fhtData");
 // }
+
+#endif //ESP32_COLOR_MUSIC_SERIALPORTINTERACTION_H
