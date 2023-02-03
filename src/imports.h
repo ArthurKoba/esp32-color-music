@@ -4,7 +4,7 @@
 #include <FastLED.h>
 
 #include "serialPortInteraction.h"
-#include "colorMusic/fft.h"
+#include "colorMusic/colorMusic.h"
 #include "ledStrip.h"
 #include "colorModes.h"
 
