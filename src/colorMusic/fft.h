@@ -1,5 +1,5 @@
-#ifndef ESP32_COLOR_MUSIC_CORE_H
-#define ESP32_COLOR_MUSIC_CORE_H
+#ifndef ESP32_COLOR_MUSIC_FFT_H
+#define ESP32_COLOR_MUSIC_FFT_H
 
 
 #ifndef SAMPLES_SIZE
@@ -74,4 +74,4 @@ private:
     float frequencyStep = 0.0;
 };
 
-#endif //ESP32_COLOR_MUSIC_CORE_H
+#endif //ESP32_COLOR_MUSIC_FFT_H

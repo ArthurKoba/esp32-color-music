@@ -2,7 +2,7 @@
 // Created by Koba on 31.01.2023.
 //
 
-#include "core.h"
+#include "fft.h"
 
 ColorMusic *actualColorMusic = nullptr; // todo delete this
 
