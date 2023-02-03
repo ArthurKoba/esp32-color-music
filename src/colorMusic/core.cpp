@@ -2,9 +2,9 @@
 // Created by Koba on 31.01.2023.
 //
 
-#include "colorMusicCore.h"
+#include "core.h"
 
-ColorMusic *actualColorMusic = nullptr;
+ColorMusic *actualColorMusic = nullptr; // todo delete this
 
 ColorMusic::ColorMusic(CRGB *leds) {
     actualColorMusic = this;

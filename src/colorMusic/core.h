@@ -1,5 +1,5 @@
-#ifndef ESP32_COLOR_MUSIC_COLORMUSICCORE_H
-#define ESP32_COLOR_MUSIC_COLORMUSICCORE_H
+#ifndef ESP32_COLOR_MUSIC_CORE_H
+#define ESP32_COLOR_MUSIC_CORE_H
 
 
 #ifndef SAMPLES_SIZE
@@ -9,7 +9,7 @@
 #define AMPLITUDES_SIZE SAMPLES_SIZE / 2
 
 #include "BluetoothA2DPSink.h"
-#include <FastLED.h>
+#include "FastLED.h"
 #include "esp_dsp.h"
 #include "cmath"
 
@@ -74,4 +74,4 @@ private:
     float frequencyStep = 0.0;
 };
 
-#endif //ESP32_COLOR_MUSIC_COLORMUSICCORE_H
+#endif //ESP32_COLOR_MUSIC_CORE_H

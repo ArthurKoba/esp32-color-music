@@ -1,4 +1,4 @@
-#include "colorMusicCore.h"
+#include "colorMusic/core.h"
 
 void execIrCommandTest(ColorMusic &colorMusicObj) {
     if (!IrReceiver.decode()) return;
