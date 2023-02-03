@@ -5,6 +5,7 @@
 
 #include "serialPortInteraction.h"
 #include "colorMusicCore.h"
+#include "ledStrip.h"
 #include "colorModes.h"
 
 #include "audioReceiver.h"
