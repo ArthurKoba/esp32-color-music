@@ -7,6 +7,10 @@
 
 #include <FastLED.h>
 
+enum NotificationLedStrip : uint8_t {
+    SET_COLOR, SET_LEDS
+};
+
 class LedStrip {
 public:
     explicit LedStrip(CRGB *leds, uint16_t ledsLength);
@@ -26,8 +30,8 @@ public:
     uint16_t ledsLength;
 
 private:
+    CRGB showColorValue;
     TaskHandle_t handleShowTask = nullptr;
-    QueueHandle_t showColorQueue = nullptr;
     [[noreturn]] static void sendExecutor(void *pvParam);
 };
 

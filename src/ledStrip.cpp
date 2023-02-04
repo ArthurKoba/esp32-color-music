@@ -1,16 +1,11 @@
-//
-// Created by Koba on 03.02.2023.
-//
-
 #include "ledStrip.h"
 
 LedStrip::LedStrip(CRGB *leds, uint16_t ledsLength) {
     this->leds = leds;
     this->ledsLength = ledsLength;
-    showColorQueue = xQueueCreate(1, sizeof(CRGB));
     xTaskCreate(
             LedStrip::sendExecutor,
-            "LedStripShowTask",
+            "LedStripExecutor",
             2048,
             this,
             9, // todo setting old
@@ -19,44 +14,31 @@ LedStrip::LedStrip(CRGB *leds, uint16_t ledsLength) {
 
 LedStrip::~LedStrip() {
     vTaskDelete(&handleShowTask);
-    vQueueDelete(showColorQueue);
 }
 
 void LedStrip::sendExecutor(void *pvParam) {
-    LedStrip thisObject = *(LedStrip*) pvParam;
-    CRGB color;
+    LedStrip &object = *(LedStrip*)pvParam;
+    uint32_t notificationType;
     while (true) {
-//        if (xQueueReceive(thisObject.showColorQueue, &color, pdMS_TO_TICKS(1)) == pdTRUE) {
-//            printf("[%lu] сolor notification", millis());
-////            if (color.red == 0 == CRGB::Black)
-//            FastLED.showColor(color);
-//            printf("[%lu] сolor showed\n", millis());
-//        }
-//
-//        if (xTaskNotifyWait(0, 0, 0, pdMS_TO_TICKS(1)) == pdPASS) {
-//            printf("[%lu] segment notification\n", millis());
-//            FastLED.show();
-//            printf("[%lu] segment showed\n", millis());
-//        }
-        vTaskDelay(pdMS_TO_TICKS(1000));
-        FastLED.showColor(CRGB::Red);
-        vTaskDelay(pdMS_TO_TICKS(1000));
-        FastLED.showColor(CRGB::Black);
-        vTaskDelay(pdMS_TO_TICKS(1000));
-        thisObject.setRightSegmentColor(CRGB::Blue);
-        FastLED.show();
-        vTaskDelay(pdMS_TO_TICKS(1000));
-        FastLED.showColor(CRGB::Black);
-
+        if (xTaskNotifyWait(0, 0, &notificationType, portMAX_DELAY) != pdPASS) continue;
+        switch (notificationType) {
+            case SET_COLOR:
+                FastLED.showColor(object.showColorValue);
+                break;
+            case SET_LEDS:
+                FastLED.show();
+                break;
+        }
     }
 }
 
 void LedStrip::showColor(CRGB color) {
-    xQueueOverwrite(showColorQueue, &color);
+    showColorValue = color;
+    xTaskNotify(handleShowTask, SET_COLOR, eSetValueWithOverwrite);
 }
 
 void LedStrip::show() {
-    xTaskNotify(handleShowTask, 0, eNoAction);
+    xTaskNotify(handleShowTask, SET_LEDS, eSetValueWithOverwrite);
 }
 
 void LedStrip::clearLeds() {
@@ -88,4 +70,3 @@ void LedStrip::setLeftSegmentColor(CRGB color) {
 void LedStrip::setRightSegmentColor(CRGB color) {
     for (uint16_t i = 151; i < ledsLength-25; ++i) leds[i] = color;
 }
-
