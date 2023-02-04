@@ -45,6 +45,10 @@ void LedStrip::clearLeds() {
     for (uint16_t i = 0; i < ledsLength; ++i) leds[i] = CRGB::Black;
 }
 
+void LedStrip::setBrightness(uint8_t bright) {
+    FastLED.setBrightness(bright);
+}
+
 void LedStrip::setLeftColor(CRGB color) {
     for (uint16_t i = 0; i < ledsLength/2; ++i) leds[i] = color;
 }

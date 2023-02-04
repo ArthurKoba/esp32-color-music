@@ -19,6 +19,8 @@ public:
     void showColor(CRGB color);
     void show();
     void clearLeds();
+    void setBrightness(uint8_t bright);
+    
     void setLeftColor(CRGB color);
     void setRightColor(CRGB color);
     void setUpperSegmentColor(CRGB color);
