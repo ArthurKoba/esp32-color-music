@@ -14,14 +14,16 @@ void RemoteControl::handleCommands() {
     handleIR();
 }
 
-void RemoteControl::handleIRCommand(uint16_t command) {
+void RemoteControl::handleIRCommand(IRButton command) {
     printf("Exec command: %i\n", command);
 }
 
 void RemoteControl::handleIR() {
     if (!IrReceiver.decode()) return;
     if (IrReceiver.decodedIRData.command != 0 || IrReceiver.decodedIRData.decodedRawData == -16716032) {
-        handleIRCommand(IrReceiver.decodedIRData.command);
+        if (IrReceiver.decodedIRData.command > 23) return;
+
+        handleIRCommand((IRButton)IrReceiver.decodedIRData.command);
     }
     IrReceiver.resume();
 }

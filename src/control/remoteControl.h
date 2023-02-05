@@ -10,6 +10,15 @@
 #error IR_RECEIVE_PIN not defined!
 #endif
 
+enum IRButton : uint8_t {
+    BRIGHT_UP_BUTTON, BRIGHT_DOWN_BUTTON, OFF_BUTTON, ON_BUTTON,
+    RED_BUTTON, GREEN_BUTTON, BLUE_BUTTON, WHITE_BUTTON,
+    ORANGERED_BUTTON, LIME_BUTTON, VIOLET_BUTTON, FLASH_BUTTON,
+    ORANGE_BUTTON, CYAN_BUTTON, PURPLE_BUTTON, STROBE_BUTTON,
+    GOLD_BUTTON, GREENCYAN_BUTTON, ORCHID_BUTTON, FADE_BUTTON,
+    YELLOW_BUTTON, NAVY_BUTTON, PINK_BUTTON, SMOOTH_BUTTON
+};
+
 class RemoteControl {
 public:
     RemoteControl();
@@ -18,7 +27,7 @@ public:
     void setColorModes(ColorModes *colorModes);
 private:
     void handleIR();
-    void handleIRCommand(uint16_t command);
+    void handleIRCommand(IRButton command);
     ColorModes *colorModes;
 };
 
