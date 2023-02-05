@@ -10,5 +10,4 @@
 #include "colorModes/colorModes.h"
 
 #include "audioReceiver.h"
-#include "encoder.h"
 #include "ir.h"

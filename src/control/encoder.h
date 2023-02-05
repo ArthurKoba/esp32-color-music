@@ -1,13 +1,16 @@
+#ifndef ESP32_COLOR_MUSIC_ENCODER_H
+#define ESP32_COLOR_MUSIC_ENCODER_H
+
 #ifndef ENCODER_CLK_PIN
-  #error ENCODER_CLK_PIN required.
+#error ENCODER_CLK_PIN required.
 #endif
 
 #ifndef ENCODER_DT_PIN
-  #error ENCODER_DT_PIN required.
+#error ENCODER_DT_PIN required.
 #endif
 
 #ifndef ENCODER_DELTA_TIME_MS
-  #define ENCODER_DELTA_TIME_MS 50
+#define ENCODER_DELTA_TIME_MS 50
 #endif
 
 
@@ -39,12 +42,12 @@ void IRAM_ATTR isrEncoderAB() {
 
 #ifdef ENCODER_BTN_PIN
 void IRAM_ATTR isrEncoderBTN() {
-  uint32_t time = millis();
-  if (time - encoderData.lastUpdateBTN < ENCODER_DELTA_TIME_MS) return;
-  encoderData.isPressed = !digitalRead(ENCODER_BTN_PIN);
-  if (!encoderData.isPressed) encoderData.isClicked = true;
-  encoderData.isUpdated = true;
-  encoderData.lastUpdateBTN = time;
+    uint32_t time = millis();
+    if (time - encoderData.lastUpdateBTN < ENCODER_DELTA_TIME_MS) return;
+    encoderData.isPressed = !digitalRead(ENCODER_BTN_PIN);
+    if (!encoderData.isPressed) encoderData.isClicked = true;
+    encoderData.isUpdated = true;
+    encoderData.lastUpdateBTN = time;
 }
 #endif
 
@@ -75,4 +78,6 @@ void execEncoder(BluetoothA2DPSink &a2dp_sink) {
     }
     encoderData.isUpdated = false;
     encoderData.isClicked = false;
-}
+
+
+#endif //ESP32_COLOR_MUSIC_ENCODER_H}
