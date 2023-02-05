@@ -1,12 +1,15 @@
 #include "colorModes.h"
 
-ColorModes::ColorModes(CustomLedStrip &strip) : strip(strip) {
+ColorModes::ColorModes(CustomLedStrip &strip, ColorMusic &colorMusic) : colorMusic(colorMusic), strip(strip) {
     this->mode = OFF_MODE;
 }
 
 void ColorModes::setMode(ColorMode newMode) {
+    if (mode == newMode) return;
+    strip.clear(); strip.show();
+    if (mode != newMode && newMode == COLOR_MUSIC_MODE) colorMusic.enable();
+    if (mode == COLOR_MUSIC_MODE && newMode != COLOR_MUSIC_MODE) colorMusic.disable();
     this->mode = newMode;
-    if (newMode == OFF_MODE) strip.showColor(CRGB::Black);
 }
 
 void ColorModes::show() {
@@ -15,6 +18,9 @@ void ColorModes::show() {
             break;
         case RAINBOW_MODE:
             rainbowMode();
+            break;
+        case COLOR_MUSIC_MODE:
+            colorMusic.show();
             break;
     }
 }

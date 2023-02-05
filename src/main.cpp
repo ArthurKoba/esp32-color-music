@@ -3,7 +3,8 @@
 
 CRGB leds[NUM_LEDS];
 CustomLedStrip strip;
-ColorModes colorModes(strip);
+ColorMusic colorMusic;
+ColorModes colorModes(strip, colorMusic);
 RemoteControl control;
 
 //BluetoothA2DPSink a2dp_sink;
