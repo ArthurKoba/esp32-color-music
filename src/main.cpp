@@ -36,6 +36,7 @@ ColorModes colorModes(strip);
 
 void setup() {
     Serial.begin(SERIAL_SPEED);
+    printf("\n%s Starting...\n", BLUETOOTH_DEVICE_NAME);
     CFastLED::addLeds<WS2812B, WS2812B_PIN, GRB>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
     strip.start(leds, NUM_LEDS);
     strip.setBrightness(100);
@@ -53,9 +54,7 @@ void setup() {
 //    a2dp_sink.start(BLUETOOTH_DEVICE_NAME);
 //    setupEncoder();
 //    IrReceiver.begin(IR_RECEIVE_PIN);
-    Serial.print('\n');
-    Serial.print(BLUETOOTH_DEVICE_NAME);
-    Serial.println(" Started!");
+
 }
 
 void loop() {
