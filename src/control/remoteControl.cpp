@@ -25,3 +25,7 @@ void RemoteControl::handleIR() {
     }
     IrReceiver.resume();
 }
+
+void RemoteControl::setColorModes(ColorModes *colorModesObject) {
+    this->colorModes = colorModesObject;
+}

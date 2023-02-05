@@ -15,6 +15,7 @@ public:
     RemoteControl();
     void setup();
     void handleCommands();
+    void setColorModes(ColorModes *colorModes);
 private:
     void handleIR();
     void handleIRCommand(uint16_t command);

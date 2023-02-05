@@ -53,8 +53,8 @@ void setup() {
 ////    a2dp_sink.set_task_core(0);
 //    a2dp_sink.start(BLUETOOTH_DEVICE_NAME);
 //    setupEncoder();
-//    IrReceiver.begin(IR_RECEIVE_PIN);
 
+    control.setColorModes(&colorModes);
 }
 
 void loop() {
