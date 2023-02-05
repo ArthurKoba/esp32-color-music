@@ -4,9 +4,10 @@
 #include <FastLED.h>
 
 #include "serialPortInteraction.h"
+
 #include "colorMusic/colorMusic.h"
 #include "ledStrip/customLedStrip.h"
-#include "colorModes.h"
+#include "colorModes/colorModes.h"
 
 #include "audioReceiver.h"
 #include "encoder.h"
