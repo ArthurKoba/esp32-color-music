@@ -55,3 +55,13 @@ void LedStrip::clear() {
 void LedStrip::setBrightness(uint8_t bright) {
     FastLED.setBrightness(bright);
 }
+
+uint8_t LedStrip::getBrightness() {
+    return FastLED.getBrightness();
+}
+
+void LedStrip::changeBrightness(int16_t value) {
+    value += getBrightness();
+    uint8_t newValue = ((value)<(0)?(0):((value)>(255)?(255):(value)));
+    setBrightness(newValue);
+}

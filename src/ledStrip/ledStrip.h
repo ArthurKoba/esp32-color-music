@@ -20,7 +20,10 @@ public:
     void showColor(CRGB color);
     void show();
     void clear();
+
+    void changeBrightness(int16_t changeValue);
     void setBrightness(uint8_t bright);
+    uint8_t getBrightness();
 
     CRGB *leds;
     uint16_t length;
