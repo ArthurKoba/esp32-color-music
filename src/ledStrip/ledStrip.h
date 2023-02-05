@@ -5,7 +5,7 @@
 #ifndef ESP32_COLOR_MUSIC_LEDSTRIP_H
 #define ESP32_COLOR_MUSIC_LEDSTRIP_H
 
-#include <FastLED.h>
+#include "FastLED.h"
 
 enum NotificationLedStrip : uint8_t {
     SET_COLOR, SET_LEDS
@@ -13,28 +13,22 @@ enum NotificationLedStrip : uint8_t {
 
 class LedStrip {
 public:
-    explicit LedStrip(CRGB *leds, uint16_t ledsLength);
+     LedStrip();
     ~LedStrip();
 
+    void start(CRGB *leds, uint16_t ledsLength);
     void showColor(CRGB color);
     void show();
-    void clearLeds();
+    void clear();
     void setBrightness(uint8_t bright);
-    
-    void setLeftColor(CRGB color);
-    void setRightColor(CRGB color);
-    void setUpperSegmentColor(CRGB color);
-    void setUnderSegmentColor(CRGB color);
-    void setLeftSegmentColor(CRGB color);
-    void setRightSegmentColor(CRGB color);
 
     CRGB *leds;
-    uint16_t ledsLength;
+    uint16_t length;
 
-private:
-    CRGB showColorValue;
+protected:
     TaskHandle_t handleShowTask = nullptr;
     [[noreturn]] static void sendExecutor(void *pvParam);
+    CRGB showColorValue;
 };
 
 #endif //ESP32_COLOR_MUSIC_LEDSTRIP_H
