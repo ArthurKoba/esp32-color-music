@@ -10,4 +10,3 @@
 #include "control/remoteControl.h"
 
 #include "audioReceiver.h"
-#include "ir.h"
