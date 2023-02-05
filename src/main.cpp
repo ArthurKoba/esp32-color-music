@@ -1,10 +1,10 @@
 #include "configs.h"
 #include "imports.h"
-#include "testIRexecutor.h"
 
 CRGB leds[NUM_LEDS];
 CustomLedStrip strip;
 ColorModes colorModes(strip);
+RemoteControl control;
 
 //BluetoothA2DPSink a2dp_sink;
 //FFTColorMusic colorMusic(leds);
@@ -41,7 +41,7 @@ void setup() {
     strip.start(leds, NUM_LEDS);
     strip.setBrightness(100);
     colorModes.setMode(RAINBOW_MODE);
-
+    control.setup();
 //    a2dp_sink.set_pin_config(i2sPins);
 //    a2dp_sink.set_raw_stream_reader([] (const uint8_t *d, uint32_t l) {colorMusic.addSamples(d, l);});
 //    a2dp_sink.set_sample_rate_callback([] (uint16_t rate) {colorMusic.setSampleRate(rate);});
@@ -58,6 +58,7 @@ void setup() {
 }
 
 void loop() {
+    control.handleCommands();
     colorModes.show();
 //    execEncoder(a2dp_sink);
 //    execIrCommandTest(colorMusic);
