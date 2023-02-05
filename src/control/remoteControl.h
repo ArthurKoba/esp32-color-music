@@ -4,6 +4,7 @@
 #include "configs.h"
 #include "Arduino.h" // from import uint16_t and another types
 #include "colorModes/colorModes.h"
+#include "ledStrip/ledStrip.h"
 
 
 #ifndef IR_RECEIVE_PIN
@@ -23,12 +24,16 @@ class RemoteControl {
 public:
     RemoteControl();
     void setup();
+    void setColorModes(ColorModes *colorModes);
+    void setLedStrip(LedStrip *ledStrip);
+
     void handleCommands();
     void setColorModes(ColorModes *colorModes);
 private:
     void handleIR();
     void handleIRCommand(IRButton command);
     ColorModes *colorModes;
+    LedStrip *strip;
 };
 
 #endif //ESP32_COLOR_MUSIC_REMOTECONTROL_H

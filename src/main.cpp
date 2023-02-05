@@ -53,7 +53,7 @@ void setup() {
 ////    a2dp_sink.set_task_core(0);
 //    a2dp_sink.start(BLUETOOTH_DEVICE_NAME);
 //    setupEncoder();
-
+    control.setLedStrip((LedStrip*)&strip);
     control.setColorModes(&colorModes);
 }
 

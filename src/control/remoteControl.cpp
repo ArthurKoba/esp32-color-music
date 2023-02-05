@@ -4,6 +4,7 @@
 
 RemoteControl::RemoteControl() {
     this->colorModes = nullptr;
+    this->strip = nullptr;
 }
 
 void RemoteControl::setup() {
@@ -18,8 +19,10 @@ void RemoteControl::handleIRCommand(IRButton command) {
     printf("Exec command: %i\n", command);
     switch (command) {
         case BRIGHT_UP_BUTTON:
+            if (strip != nullptr) strip->changeBrightness(+5);
             break;
         case BRIGHT_DOWN_BUTTON:
+            if (strip != nullptr) strip->changeBrightness(-5);
             break;
         case OFF_BUTTON:
             if (colorModes != nullptr) colorModes->setMode(OFF_MODE);
@@ -83,3 +86,8 @@ void RemoteControl::handleIR() {
 void RemoteControl::setColorModes(ColorModes *colorModesObject) {
     this->colorModes = colorModesObject;
 }
+
+void RemoteControl::setLedStrip(LedStrip *ledStrip) {
+    this->strip = ledStrip;
+}
+
