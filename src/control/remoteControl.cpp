@@ -19,7 +19,7 @@ void RemoteControl::handleCommands() {
 void RemoteControl::handleTestIRCommand(IRButton command) {
     FFTConfig fftConfig;
     if (colorMusic == nullptr && command > 3) return;
-    else fftConfig = colorMusic->getFFTconfig();
+    else fftConfig = colorMusic->getConfigFFT();
 
     switch (command) {
         case BRIGHT_UP_BUTTON:
@@ -38,13 +38,13 @@ void RemoteControl::handleTestIRCommand(IRButton command) {
                 fftConfig.amplitudesType = LIN;
             break;
         case GREEN_BUTTON:
-                fftConfig.amplitudesType = BARK;
+            fftConfig.amplitudesType = LOG;
             break;
         case BLUE_BUTTON:
-            fftConfig.amplitudesType = CUSTOM_BARK;
+            fftConfig.amplitudesType = BARK;
             break;
         case WHITE_BUTTON:
-            fftConfig.amplitudesType = LOG;
+            fftConfig.amplitudesType = CUSTOM_BARK;
             break;
         case ORANGERED_BUTTON:
             fftConfig.windowType = NO_WINDOW;
@@ -87,7 +87,7 @@ void RemoteControl::handleTestIRCommand(IRButton command) {
         case SMOOTH_BUTTON:
             break;
     }
-    if (command > 3) colorMusic->setFFTconfig(fftConfig);
+    if (command > 3) colorMusic->setConfigFFT(fftConfig);
 }
 
 void RemoteControl::handleIRCommand(IRButton command) {
