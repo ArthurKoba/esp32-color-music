@@ -26,11 +26,13 @@ public:
     void setup();
     void setColorModes(ColorModes *colorModesPointer);
     void setLedStrip(LedStrip *stripPointer);
+    void setColorMusic(ColorMusic *colorMusicPointer);
 
     void handleCommands();
 private:
     void handleIR();
     void handleIRCommand(IRButton command);
+    ColorMusic *colorMusic;
     ColorModes *colorModes;
     LedStrip *strip;
 };

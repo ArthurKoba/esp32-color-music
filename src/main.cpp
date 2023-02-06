@@ -56,6 +56,7 @@ void setup() {
 //    setupEncoder();
     control.setLedStrip((LedStrip*)&strip);
     control.setColorModes(&colorModes);
+    control.setColorMusic(&colorMusic);
 }
 
 void loop() {

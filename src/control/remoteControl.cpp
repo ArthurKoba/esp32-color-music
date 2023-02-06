@@ -91,3 +91,7 @@ void RemoteControl::setLedStrip(LedStrip *stripPointer) {
     this->strip = stripPointer;
 }
 
+void RemoteControl::setColorMusic(ColorMusic *colorMusicPointer) {
+    this->colorMusic = colorMusicPointer;
+}
+
