@@ -1,4 +1,3 @@
-
 #include "remoteControl.h"
 #include <IRRemote.hpp>
 
@@ -28,6 +27,7 @@ void RemoteControl::handleIRCommand(IRButton command) {
             if (colorModes != nullptr) colorModes->setMode(OFF_MODE);
             break;
         case ON_BUTTON:
+            if (colorModes != nullptr) colorModes->setMode(COLOR_MUSIC_MODE);
             break;
         case RED_BUTTON:
             break;
@@ -83,11 +83,11 @@ void RemoteControl::handleIR() {
     IrReceiver.resume();
 }
 
-void RemoteControl::setColorModes(ColorModes *colorModesObject) {
-    this->colorModes = colorModesObject;
+void RemoteControl::setColorModes(ColorModes *colorModesPointer) {
+    this->colorModes = colorModesPointer;
 }
 
-void RemoteControl::setLedStrip(LedStrip *ledStrip) {
-    this->strip = ledStrip;
+void RemoteControl::setLedStrip(LedStrip *stripPointer) {
+    this->strip = stripPointer;
 }
 

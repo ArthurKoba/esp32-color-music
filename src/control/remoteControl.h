@@ -24,11 +24,10 @@ class RemoteControl {
 public:
     RemoteControl();
     void setup();
-    void setColorModes(ColorModes *colorModes);
-    void setLedStrip(LedStrip *ledStrip);
+    void setColorModes(ColorModes *colorModesPointer);
+    void setLedStrip(LedStrip *stripPointer);
 
     void handleCommands();
-    void setColorModes(ColorModes *colorModes);
 private:
     void handleIR();
     void handleIRCommand(IRButton command);
