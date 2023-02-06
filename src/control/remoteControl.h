@@ -32,6 +32,7 @@ public:
 private:
     void handleIR();
     void handleIRCommand(IRButton command);
+    void handleTestIRCommand(IRButton command);
     ColorMusic *colorMusic;
     ColorModes *colorModes;
     LedStrip *strip;

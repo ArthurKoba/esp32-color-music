@@ -4,6 +4,7 @@
 RemoteControl::RemoteControl() {
     this->colorModes = nullptr;
     this->strip = nullptr;
+    this->colorMusic = nullptr;
 }
 
 void RemoteControl::setup() {
@@ -14,8 +15,89 @@ void RemoteControl::handleCommands() {
     handleIR();
 }
 
+
+void RemoteControl::handleTestIRCommand(IRButton command) {
+    switch (command) {
+        case BRIGHT_UP_BUTTON:
+            if (strip != nullptr) strip->changeBrightness(+5);
+            break;
+        case BRIGHT_DOWN_BUTTON:
+            if (strip != nullptr) strip->changeBrightness(-5);
+            break;
+        case OFF_BUTTON:
+            if (colorModes != nullptr) colorModes->setMode(OFF_MODE);
+            break;
+        case ON_BUTTON:
+            if (colorModes != nullptr) colorModes->setMode(COLOR_MUSIC_MODE);
+            break;
+        case RED_BUTTON:
+            if (colorMusic != nullptr) {
+                FFTConfig fftConfig = colorMusic->getFFTconfig();
+                fftConfig.amplitudesType = LIN;
+                colorMusic->setFFTconfig(fftConfig);
+            }
+            break;
+        case GREEN_BUTTON:
+            if (colorMusic != nullptr) {
+                FFTConfig fftConfig = colorMusic->getFFTconfig();
+                fftConfig.amplitudesType = BARK;
+                colorMusic->setFFTconfig(fftConfig);
+            }
+            break;
+        case BLUE_BUTTON:
+            if (colorMusic != nullptr) {
+                FFTConfig fftConfig = colorMusic->getFFTconfig();
+                fftConfig.amplitudesType = CUSTOM_BARK;
+                colorMusic->setFFTconfig(fftConfig);
+            }
+            break;
+        case WHITE_BUTTON:
+            if (colorMusic != nullptr) {
+                FFTConfig fftConfig = colorMusic->getFFTconfig();
+                fftConfig.amplitudesType = LOG;
+                colorMusic->setFFTconfig(fftConfig);
+            }
+            break;
+        case ORANGERED_BUTTON:
+            break;
+        case LIME_BUTTON:
+            break;
+        case VIOLET_BUTTON:
+            break;
+        case FLASH_BUTTON:
+            break;
+        case ORANGE_BUTTON:
+            break;
+        case CYAN_BUTTON:
+            break;
+        case PURPLE_BUTTON:
+            break;
+        case STROBE_BUTTON:
+            break;
+        case GOLD_BUTTON:
+            break;
+        case GREENCYAN_BUTTON:
+            break;
+        case ORCHID_BUTTON:
+            break;
+        case FADE_BUTTON:
+            break;
+        case YELLOW_BUTTON:
+            break;
+        case NAVY_BUTTON:
+            break;
+        case PINK_BUTTON:
+            break;
+        case SMOOTH_BUTTON:
+            if (colorModes != nullptr) colorModes->setMode(RAINBOW_MODE);
+            break;
+    }
+}
+
 void RemoteControl::handleIRCommand(IRButton command) {
     printf("Exec command: %i\n", command);
+    handleTestIRCommand(command);
+    return;
     switch (command) {
         case BRIGHT_UP_BUTTON:
             if (strip != nullptr) strip->changeBrightness(+5);
