@@ -1,81 +1,148 @@
-//
-// Created by Koba on 31.01.2023.
-//
-
 #include "fft.h"
 
-ColorMusic *actualColorMusic = nullptr; // todo delete this
+FFTColorMusic::FFTColorMusic(FFTConfig &config) {
+    printf("[%lu] Constructor FFTColorMusic\n", millis());
+    fftTable = new float[SAMPLES_SIZE];
+    dsps_fft2r_init_fc32(fftTable, SAMPLES_SIZE);
+    samples.fullness = 0;
 
-ColorMusic::ColorMusic(CRGB *leds) {
-    actualColorMusic = this;
-    this->leds = leds;
-    samplesFullness = 0;
-    samples = new Samples;
-    amplitudes = new Amplitudes;
-    barkScale = new float[AMPLITUDES_SIZE]; // todo do free memory
-    fastAmplitudes = new uint8_t[AMPLITUDES_SIZE]; // todo do free memory
-    dsps_fft2r_init_fc32(nullptr, SAMPLES_SIZE); // todo do free memory
-    setAmplitudesType(amplitudesType);
-    setWindowType(FLAT_TOP);
+    if (config.windowType != NO_WINDOW) {
+        printf("[%lu] memory allocation for the window\n", millis());
+        this->fftWindow = new float[SAMPLES_SIZE];
+        generateWindow(config.windowType);
+    }
 
-//  todo find optimal stack depth and cores. configMINIMAL_STACK_SIZE - not enough, 2048 - there may be many
-    xTaskCreate(ColorMusic::fftExecutor, "colorMusicFFT", 2048, nullptr, 10, &fftTask);
-    xTaskCreate(ColorMusic::colorsExecutor, "colorMusicColorsExecutor", 2048, nullptr, 8, &colorsTask);
-    xTaskCreate(ColorMusic::sendExecutor, "colorMusicSendExecutor", 2048, nullptr, 8, &sendTask);
+    if (config.amplitudesType == BARK || config.amplitudesType == CUSTOM_BARK) {
+        printf("[%lu] memory allocation for the bark scale\n", millis());
+        this->barkScale = new float[AMPLITUDES_SIZE];
+        if (config.amplitudesType == BARK)
+            generateBarkScale(config.frequencyStep);
+        else if (config.amplitudesType == CUSTOM_BARK)
+            generateCustomBarkScale(config.frequencyStep);
+    }
+
+    cfg = config;
+
+    xTaskCreate(FFTColorMusic::fftExecutor,
+                "FFTcolorMusic",
+                2048,
+                this,
+                13,
+                &fftTask);
 }
 
-ColorMusic::~ColorMusic() {
-    actualColorMusic = nullptr;
-    delete samples;
-    delete amplitudes;
-    delete fastAmplitudes;
-    delete barkScale;
-    dsps_fft2r_deinit_fc32();
-    vTaskDelete(&fftTask);
-    vTaskDelete(&colorsTask);
-    vTaskDelete(&sendTask);
+FFTColorMusic::~FFTColorMusic() {
+    printf("[%lu] Destructor FFTColorMusic\n", millis());
+    vTaskDelete(fftTask);
+    if (cfg.windowType != NO_WINDOW) {
+        printf("[%lu] freeing window memory\n", millis());
+        delete fftWindow;
+    }
+    if (cfg.amplitudesType == BARK || cfg.amplitudesType == CUSTOM_BARK) {
+        printf("[%lu] freeing window memory bark scale\n", millis());
+        delete barkScale;
+    }
+    delete fftTable;
+}
+
+void FFTColorMusic::setConfigs(FFTConfig &newCfg) {
+    bool isNeedWindow = newCfg.windowType != NO_WINDOW;
+    bool isWindowsGenerated = cfg.windowType != NO_WINDOW;
+
+    if (newCfg.windowType != cfg.windowType) {
+        printf("[%lu] change window type from %i to %i\n", millis(), cfg.windowType, newCfg.windowType);
+    }
+    if (isNeedWindow && !isWindowsGenerated) {
+        printf("[%lu] memory allocation for the window\n", millis());
+        this->fftWindow = new float[SAMPLES_SIZE];
+
+    } else if (isWindowsGenerated && !isNeedWindow) {
+        printf("[%lu] freeing window memory\n", millis());
+        delete fftWindow;
+    }
+    if (isNeedWindow && newCfg.windowType != cfg.windowType) {
+        generateWindow(newCfg.windowType);
+    }
+
+    bool isNeedBarkScale = newCfg.amplitudesType == BARK || newCfg.amplitudesType == CUSTOM_BARK;
+    bool isBarkScaleGenerated = cfg.amplitudesType == BARK || cfg.amplitudesType == CUSTOM_BARK;
+    bool isNeedUpdateBarkScale = (cfg.amplitudesType != newCfg.amplitudesType || newCfg.frequencyStep != cfg.frequencyStep);
+
+    if (newCfg.amplitudesType != cfg.amplitudesType) {
+        printf("[%lu] changing the type of amplitudes from %i to %i\n", millis(), cfg.amplitudesType, newCfg.amplitudesType);
+    }
+
+    if (isBarkScaleGenerated && !isNeedBarkScale) {
+        printf("[%lu] freeing window memory bark scale\n", millis());
+        delete barkScale;
+    } else if (isNeedBarkScale && !isBarkScaleGenerated) {
+        printf("[%lu] memory allocation for the bark scale\n", millis());
+        this->barkScale = new float[AMPLITUDES_SIZE];
+    }
+    if (isNeedUpdateBarkScale && newCfg.amplitudesType == BARK) {
+        generateBarkScale(newCfg.frequencyStep);
+    } else if (isNeedUpdateBarkScale && newCfg.amplitudesType == CUSTOM_BARK) {
+        generateCustomBarkScale(newCfg.frequencyStep);
+    }
+    cfg = newCfg;
 }
 
 
-void ColorMusic::addSamples(const uint8_t *data, uint32_t length) {
-//    printf("[%lu] addSamples | new samples\n", millis());
+[[noreturn]] void FFTColorMusic::fftExecutor(void *thisPointer) {
+    FFTColorMusic &object = *(FFTColorMusic*)thisPointer;
+    printf("[%lu] Start FFT Executor\n", millis());
+    while (true) {
+        if (xTaskNotifyWait(0, 0, 0, portMAX_DELAY) != pdPASS) continue;
+//        printf("[%lu] fftExecutor | start calculating fft\n", millis());
+        object.calcFFT(object.samples.left, object.amplitudes.left);
+        object.calcFFT(object.samples.right, object.amplitudes.right);
+//        printf("[%lu] fftExecutor | end calculating fft\n", millis());
+//        xTaskNotify(actualColorMusic->colorsTask, 0, eNoAction); // todo execute result
+    }
+}
+
+
+
+void FFTColorMusic::addSamples(const uint8_t *data, uint32_t length) {
+    printf("[%lu] Getting samples, adding to the sample window\n", millis());
     length = length/4;
     auto frame = (Frame*)data;
 
-    if (length == SAMPLES_SIZE) samplesFullness = 0;
+    if (length == SAMPLES_SIZE) samples.fullness = 0;
 
-    if (samplesFullness + length > SAMPLES_SIZE && length < SAMPLES_SIZE) {
-        uint16_t countOfOutOfBounds =  samplesFullness + length - SAMPLES_SIZE;
+    if (samples.fullness + length > SAMPLES_SIZE && length < SAMPLES_SIZE) {
+        uint16_t countOfOutOfBounds =  samples.fullness + length - SAMPLES_SIZE;
         // Offset of the samples array by countOfOutOfBounds
         for (uint16_t i = countOfOutOfBounds; i < SAMPLES_SIZE; i++) {
-            samples->left[i - countOfOutOfBounds] = samples->left[i];
-            samples->right[i - countOfOutOfBounds] = samples->right[i];
+            samples.left[i - countOfOutOfBounds] = samples.left[i];
+            samples.right[i - countOfOutOfBounds] = samples.right[i];
         }
         // The new full value of the samples array.
-        samplesFullness -= countOfOutOfBounds;
+        samples.fullness -= countOfOutOfBounds;
     }
 
     // Filling the array with new samples
     if (SAMPLES_SIZE >= length) {
         for (uint32_t i = 0; i < length; ++i) {
-            samples->left[samplesFullness] = frame[i].channel1;
-            samples->right[samplesFullness++] = frame[i].channel2;
+            samples.left[samples.fullness] = frame[i].channel1;
+            samples.right[samples.fullness++] = frame[i].channel2;
         }
     } else {
-        for (samplesFullness = 0; samplesFullness < SAMPLES_SIZE; samplesFullness++) {
-            samples->left[SAMPLES_SIZE - 1 - samplesFullness] = frame[length - 1 - samplesFullness].channel1;
-            samples->right[SAMPLES_SIZE - 1 - samplesFullness] = frame[length - 1 - samplesFullness].channel2;
+        for (samples.fullness = 0; samples.fullness < SAMPLES_SIZE; samples.fullness++) {
+            samples.left[SAMPLES_SIZE - 1 - samples.fullness] = frame[length - 1 - samples.fullness].channel1;
+            samples.right[SAMPLES_SIZE - 1 - samples.fullness] = frame[length - 1 - samples.fullness].channel2;
         }
     }
-    if (samplesFullness == SAMPLES_SIZE) xTaskNotify(actualColorMusic->fftTask, 0, eNoAction); // todo execute result
+    if (samples.fullness == SAMPLES_SIZE) xTaskNotify(fftTask, 0, eNoAction);
 }
 
-void ColorMusic::calcFFT(const int16_t *targetSamples, float *targetAmplitudes) {
+void FFTColorMusic::calcFFT(const int16_t *samplesIn, float *amplitudeOut) {
+    // todo add mutex. maybe raise errors after change fft configs
     for (int i = 0; i < SAMPLES_SIZE; i++) {
-        if (windowType != NO_WINDOW)
-            buffer[i * 2 + 0] = (float) targetSamples[i] * fftWindow[i];
+        if (cfg.windowType != NO_WINDOW)
+            buffer[i * 2 + 0] = (float) samplesIn[i] * fftWindow[i];
         else
-            buffer[i * 2 + 0] = (float) targetSamples[i];
+            buffer[i * 2 + 0] = (float) samplesIn[i];
         buffer[i * 2 + 1] = 0;
     }
 
@@ -86,26 +153,26 @@ void ColorMusic::calcFFT(const int16_t *targetSamples, float *targetAmplitudes) 
     float temp;
     for (int i = 0 ; i < AMPLITUDES_SIZE ; i++) {
         temp = buffer[i * 2 + 0] * buffer[i * 2 + 0] + buffer[i * 2 + 1] * buffer[i * 2 + 1];
-        if (amplitudesType == LIN || amplitudesType == BARK)
-            targetAmplitudes[i] = 2 * sqrtf(temp)/SAMPLES_SIZE;
-        switch(amplitudesType) {
+        if (cfg.amplitudesType == LIN || cfg.amplitudesType == BARK)
+            amplitudeOut[i] = 2 * sqrtf(temp)/SAMPLES_SIZE;
+        switch(cfg.amplitudesType) {
             case BARK:
-                targetAmplitudes[i] *= barkScale[i];
+                amplitudeOut[i] *= barkScale[i];
                 break;
             case LOG:
-                targetAmplitudes[i] = 10 * log10f(temp/SAMPLES_SIZE);
+                amplitudeOut[i] = 10 * log10f(temp/SAMPLES_SIZE);
                 break;
             default: break;
         }
 
-        if (targetAmplitudes[i] > 32767) targetAmplitudes[i] = 32767;
-        if (targetAmplitudes[i] < 0 || isinf(targetAmplitudes[i]) || isnan(targetAmplitudes[i]))
-            targetAmplitudes[i] = 0;
+        if (amplitudeOut[i] > 32767) amplitudeOut[i] = 32767.0;
+        if (amplitudeOut[i] < 0 || isinf(amplitudeOut[i]) || isnan(amplitudeOut[i]))
+            amplitudeOut[i] = 0.0;
     }
 }
 
-void ColorMusic::generateBarkScaleTable() {
-    Serial.println("generate bark scale");
+void FFTColorMusic::generateBarkScale(float frequencyStep) {
+    printf("[%lu] Bark scale generation\n", millis());
     float base;
     for (int i = 0; i < AMPLITUDES_SIZE; i++) {
         base = (float) i * (frequencyStep/650);
@@ -113,32 +180,18 @@ void ColorMusic::generateBarkScaleTable() {
     }
 }
 
-void ColorMusic::generateCustomBarkScaleTable() {
-    Serial.println("generate custom bark scale");
+void FFTColorMusic::generateCustomBarkScale(float frequencyStep) {
+    printf("[%lu] Custom Bark scale generation\n", millis());
     float base;
     for (int i = 0; i < AMPLITUDES_SIZE; i++) {
-        base = (float) i * (frequencyStep/3000);
+        base = (float) i * (frequencyStep / 3000);
         barkScale[i] = logf(base + sqrtf(1 + base * base));
     }
 }
 
-void ColorMusic::setAmplitudesType(AmplitudesType value) {
-    if (value == BARK) generateBarkScaleTable();
-    amplitudesType = value;
-}
 
-void ColorMusic::setSampleRate(uint16_t newSampleRate) {
-    printf("sample rate new: %u \n", newSampleRate);
-    float newFrequencyStep = 1/((float) SAMPLES_SIZE/ (float) newSampleRate);
-    frequencyStep = newFrequencyStep;
-    printf("set frequencyStep: %f \n", frequencyStep);
-    generateBarkScaleTable();
-}
-
-void ColorMusic::setWindowType(WindowType newWindowType) {
-    if (windowType == newWindowType) return;
-    windowType = newWindowType;
-    switch (newWindowType) {
+void FFTColorMusic::generateWindow(WindowType type) {
+    switch (type) {
         case NO_WINDOW:
             break;
         case BLACKMAN:
@@ -162,115 +215,22 @@ void ColorMusic::setWindowType(WindowType newWindowType) {
     }
 }
 
-[[noreturn]] void ColorMusic::fftExecutor(void *pvParam) {
-    while (true) {
-        if (xTaskNotifyWait(0, 0, 0, portMAX_DELAY) != pdPASS) continue;
-        if (actualColorMusic == nullptr) continue;
-//        printf("[%lu] fftExecutor | start calculating fft\n", millis());
-        actualColorMusic->calcFFT(actualColorMusic->samples->left, actualColorMusic->amplitudes->left);
-        actualColorMusic->calcFFT(actualColorMusic->samples->right, actualColorMusic->amplitudes->right);
-//        printf("[%lu] fftExecutor | end calculating fft\n", millis());
-        xTaskNotify(actualColorMusic->colorsTask, 0, eNoAction); // todo execute result
-    }
+uint32_t FFTColorMusic::getMaxObjectSize() {
+    // MAX Size = sizeObject + fftTable(float*SAMPLES_SIZE) + window(float*SAMPLES_SIZE) + bark(float*AMPLITUDES_SIZE)
+    // todo add stack size task and another. +- 57.1k size when SAMPLES_SIZE = 2048
+    uint32_t sizeObject = sizeof(FFTColorMusic) + sizeof(float) * AMPLITUDES_SIZE * (1 + 2 + 2);
+    return sizeObject;
 }
 
-void calculateColors(const uint8_t *amplitudes, CRGB *leds, float freqStep) {
-    uint8_t low = 0;
-    uint8_t middle;
-    uint8_t high;
-
-//    auto startLowIndex = (uint16_t) (150/fftData.frequencyStep);
-//    auto endLowIndex = (uint16_t) (150/fftData.frequencyStep);
-    auto startMiddleIndex = (uint16_t) (600/freqStep);
-    auto endMiddleIndex = (uint16_t) (1500/freqStep);
-    auto startHighIndex = (uint16_t) (10000/freqStep);
-    auto endHighIndex = (uint16_t) (20000/freqStep);
-
-    low = amplitudes[7];
-//    for (auto i = startLowIndex; i < endLowIndex; ++i) {
-//        if (amplitudes[i] > low) low = amplitudes[i];
-//    }
-
-    uint32_t sum = 0;
-    for (auto i = startMiddleIndex; i < endMiddleIndex; ++i) {
-        sum += amplitudes[i];
+uint16_t FFTColorMusic::getDeltaMinMaxSample(const int16_t *samples) {
+    int16_t minValue = 0;
+    int16_t maxValue = 0;
+    for (int i = 0; i < SAMPLES_SIZE; i++) {
+        if (samples[i] > maxValue) maxValue = samples[i];
+        if (samples[i] < minValue) minValue = samples[i];
     }
-    middle = sum/(endMiddleIndex - startMiddleIndex);
-    sum = 0;
-    for (auto i = startHighIndex; i < endHighIndex; ++i) {
-        sum += amplitudes[i];
-    }
-    high = sum/(endHighIndex - startHighIndex);
-
-    int index = 0;
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 9; j++) {
-            switch (i) {
-                case 0:
-                    leds[index].setRGB(low, 0, 0);
-                    leds[229-index].setRGB(low, 0, 0);
-                    break;
-                case 1:
-                    leds[index].setRGB(0, middle, 0);
-                    leds[229-index].setRGB(0, middle, 0);
-                    break;
-                case 2:
-                    leds[index].setRGB(0, 0, high);
-                    leds[229-index].setRGB(0, 0, high);
-                    break;
-            }
-            index += 1;
-        }
-    }
-
-//    if ((millis() - timeLastShow) > 25) {
-        for (int i = 28; i < 115; i++) leds[i-1] = leds[i];
-        for (int i = 202; i > 114; i--) leds[i] = leds[i-1];
-        leds[114].setRGB(low, middle, high);
-        leds[115].setRGB(low, middle, high);
-//        timeLastShow = millis();
-//    }
-    FastLED.show();
+    return maxValue + abs(minValue);
 }
 
-[[noreturn]] void ColorMusic::colorsExecutor(void *) {
-    while (true) {
-        if (xTaskNotifyWait(0, 0, 0, portMAX_DELAY) != pdPASS) continue;
-        if (actualColorMusic == nullptr) continue;
-//        printf("[%lu] colorsExecutor | get notification fft\n", millis());
-        for (int i = 0; i < AMPLITUDES_SIZE; ++i) {
-            actualColorMusic->fastAmplitudes[i] = ((int16_t) actualColorMusic->amplitudes->left[i]) >> 6;
-        }
-        xTaskNotify(actualColorMusic->sendTask, 0, eNoAction); // todo execute result
-//        printf("[%lu] colorsExecutor | start calc colors and show\n", millis());
-        calculateColors(actualColorMusic->fastAmplitudes, actualColorMusic->leds, actualColorMusic->frequencyStep);
-//        printf("[%lu] colorsExecutor | end calc colors and show\n", millis());
-    }
-}
-
-void ColorMusic::sendExecutor(void *) {
-    bool needSend;
-    while (true) {
-        needSend = false;
-        if (xTaskNotifyWait(0, 0, 0, portMAX_DELAY) != pdPASS) continue;
-        if (actualColorMusic == nullptr) continue;
-
-
-        for (float amplitude : actualColorMusic->amplitudes->left) if (amplitude != 0.0) needSend = true;
-//        printf("-[%lu]\n", millis());
-//        if (needSend) sendJsonArray(actualColorMusic->amplitudes->left, 512, "fft");
-
-    }
-}
-
-//int32_t getAmplitudeSignal(const int16_t *samples) {
-//    int16_t minValue = 0;
-//    int16_t maxValue = 0;
-//    for (int i = 0; i < SAMPLES_SIZE; i++) {
-//        if (samples[i] > maxValue) maxValue = samples[i];
-//        if (samples[i] < minValue) minValue = samples[i];
-//    }
-//    return maxValue + abs(minValue);
-//}
 
 
