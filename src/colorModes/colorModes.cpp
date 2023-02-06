@@ -1,7 +1,7 @@
 #include "colorModes.h"
 
 ColorModes::ColorModes(CustomLedStrip &strip, ColorMusic &colorMusic) : colorMusic(colorMusic), strip(strip) {
-    this->mode = OFF_MODE;
+    this->setMode(OFF_MODE);
 }
 
 void ColorModes::setMode(ColorMode newMode) {
