@@ -41,7 +41,7 @@ void setup() {
     CFastLED::addLeds<WS2812B, WS2812B_PIN, GRB>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
     strip.start(leds, NUM_LEDS);
     strip.setBrightness(100);
-    colorModes.setMode(RAINBOW_MODE);
+    colorModes.setMode(COLOR_MUSIC_MODE);
     control.setup();
 //    a2dp_sink.set_pin_config(i2sPins);
 //    a2dp_sink.set_raw_stream_reader([] (const uint8_t *d, uint32_t l) {colorMusic.addSamples(d, l);});
