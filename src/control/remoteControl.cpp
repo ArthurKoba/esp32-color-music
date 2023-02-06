@@ -17,6 +17,10 @@ void RemoteControl::handleCommands() {
 
 
 void RemoteControl::handleTestIRCommand(IRButton command) {
+    FFTConfig fftConfig;
+    if (colorMusic == nullptr && command > 3) return;
+    else fftConfig = colorMusic->getFFTconfig();
+
     switch (command) {
         case BRIGHT_UP_BUTTON:
             if (strip != nullptr) strip->changeBrightness(+5);
@@ -31,48 +35,40 @@ void RemoteControl::handleTestIRCommand(IRButton command) {
             if (colorModes != nullptr) colorModes->setMode(COLOR_MUSIC_MODE);
             break;
         case RED_BUTTON:
-            if (colorMusic != nullptr) {
-                FFTConfig fftConfig = colorMusic->getFFTconfig();
                 fftConfig.amplitudesType = LIN;
-                colorMusic->setFFTconfig(fftConfig);
-            }
             break;
         case GREEN_BUTTON:
-            if (colorMusic != nullptr) {
-                FFTConfig fftConfig = colorMusic->getFFTconfig();
                 fftConfig.amplitudesType = BARK;
-                colorMusic->setFFTconfig(fftConfig);
-            }
             break;
         case BLUE_BUTTON:
-            if (colorMusic != nullptr) {
-                FFTConfig fftConfig = colorMusic->getFFTconfig();
-                fftConfig.amplitudesType = CUSTOM_BARK;
-                colorMusic->setFFTconfig(fftConfig);
-            }
+            fftConfig.amplitudesType = CUSTOM_BARK;
             break;
         case WHITE_BUTTON:
-            if (colorMusic != nullptr) {
-                FFTConfig fftConfig = colorMusic->getFFTconfig();
-                fftConfig.amplitudesType = LOG;
-                colorMusic->setFFTconfig(fftConfig);
-            }
+            fftConfig.amplitudesType = LOG;
             break;
         case ORANGERED_BUTTON:
+            fftConfig.windowType = NO_WINDOW;
             break;
         case LIME_BUTTON:
+            fftConfig.windowType = BLACKMAN;
             break;
         case VIOLET_BUTTON:
+            fftConfig.windowType = BLACKMAN_HARRIS;
             break;
         case FLASH_BUTTON:
+            fftConfig.windowType = BLACKMAN_NUTTALL;
             break;
         case ORANGE_BUTTON:
+            fftConfig.windowType = FLAT_TOP;
             break;
         case CYAN_BUTTON:
+            fftConfig.windowType = HANN;
             break;
         case PURPLE_BUTTON:
+            fftConfig.windowType = NUTTALL;
             break;
         case STROBE_BUTTON:
+            fftConfig.frequencyStep += 1.0;
             break;
         case GOLD_BUTTON:
             break;
@@ -89,9 +85,9 @@ void RemoteControl::handleTestIRCommand(IRButton command) {
         case PINK_BUTTON:
             break;
         case SMOOTH_BUTTON:
-            if (colorModes != nullptr) colorModes->setMode(RAINBOW_MODE);
             break;
     }
+    if (command > 3) colorMusic->setFFTconfig(fftConfig);
 }
 
 void RemoteControl::handleIRCommand(IRButton command) {
