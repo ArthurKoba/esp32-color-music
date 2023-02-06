@@ -25,15 +25,15 @@ void ColorMusic::show() {
 //    vTaskDelay(5000);
 }
 
-void ColorMusic::setSampleRate(uint16_t sampleRate) {
+void ColorMusic::setSampleRate(uint16_t sampleRate, ColorMusic *thisPointer) {
     printf("sample rate new: %u \n", sampleRate);
-    fftConfig.frequencyStep = 1/((float) SAMPLES_SIZE/ (float) sampleRate);
-    printf("set frequencyStep: %f \n", fftConfig.frequencyStep);
-    if (fft != nullptr) setConfigFFT(fftConfig);
+    thisPointer->fftConfig.frequencyStep = 1/((float) SAMPLES_SIZE/ (float) sampleRate);
+    printf("set frequencyStep: %f \n", thisPointer->fftConfig.frequencyStep);
+    if (thisPointer->fft != nullptr) thisPointer->setConfigFFT(thisPointer->fftConfig);
 }
 
-void ColorMusic::addSamples(const uint8_t *data, uint32_t length) {
-    if (fft != nullptr) fft->addSamples(data, length);
+void ColorMusic::addSamples(const uint8_t *data, uint32_t length, ColorMusic *thisPointer) {
+    if (thisPointer->fft != nullptr) thisPointer->fft->addSamples(data, length);
 }
 
 FFTConfig ColorMusic::getConfigFFT() {

@@ -8,18 +8,16 @@
 class ColorMusic {
 public:
     ColorMusic();
-//    void setBluetoothA2DPSink(BluetoothA2DPSink *a2dp);
     void enable();
     void disable();
     void show();
 
-    void setSampleRate(uint16_t sampleRate);
-    void addSamples(const uint8_t *data, uint32_t length);
+    void static setSampleRate(uint16_t sampleRate, ColorMusic *thisPointer);
+    void static addSamples(const uint8_t *data, uint32_t length, ColorMusic *thisPointer);
 
     FFTConfig getConfigFFT();
     void setConfigFFT(FFTConfig &config);
 private:
-//    BluetoothA2DPSink *a2dp = nullptr;
     FFTColorMusic *fft = nullptr;
     FFTConfig fftConfig;
 };
