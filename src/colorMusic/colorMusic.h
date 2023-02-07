@@ -14,8 +14,8 @@ public:
     void disable();
     void setupCallbacks(CustomBluetoothA2DPSink *a2dp);
 
-    void static setSampleRate(uint16_t sampleRate, ColorMusic *thisPointer);
-    void static addSamples(const uint8_t *data, uint32_t length, ColorMusic *thisPointer);
+    void static setSampleRate(uint16_t sampleRate, void *thisPointer);
+    void static addSamples(const uint8_t *data, uint32_t length, void *thisPointer);
 
     FFTConfig getConfigFFT();
     void setConfigFFT(FFTConfig &config);
