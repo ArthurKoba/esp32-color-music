@@ -8,7 +8,7 @@
 
 #define AMPLITUDES_SIZE SAMPLES_SIZE / 2
 
-#include "BluetoothA2DPSink.h"
+#include "CustomBluetoothA2DPSink.h"
 #include "FastLED.h"
 #include "esp_dsp.h"
 #include "cmath"

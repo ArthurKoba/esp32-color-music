@@ -1,5 +1,4 @@
 #include "Arduino.h"
-#include "BluetoothA2DPSink.h"
 #include <FastLED.h>
 
 #include "serialPortInteraction.h"

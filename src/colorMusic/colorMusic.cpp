@@ -2,11 +2,21 @@
 
 ColorMusic::ColorMusic() {
 
+ColorMusic::~ColorMusic() {
+    if (a2dp == nullptr) return;
+    a2dp->set_raw_stream_reader(nullptr, nullptr);
+    a2dp->set_sample_rate_callback(nullptr, nullptr);
 }
 
-//void ColorMusic::setBluetoothA2DPSink(BluetoothA2DPSink *a2dpPointer) {
-//    a2dp = a2dpPointer;
-//}
+void ColorMusic::setupCallbacks(CustomBluetoothA2DPSink *a2dpPointer) {
+    this->a2dp = a2dpPointer;
+    a2dp->set_raw_stream_reader(ColorMusic::addSamples, this);
+    a2dp->set_sample_rate_callback(ColorMusic::setSampleRate, this);
+//    a2dp_sink.set_on_volumechange(change_volume);
+//    a2dp_sink.set_on_audio_state_changed_post(callbackOnChangeAudioState);
+//    a2dp_sink.set_on_connection_state_changed(callbackChangeConnectionState);
+//    a2dp_sink.set_avrc_metadata_callback(callbackAVRCMetadata);
+}
 
 void ColorMusic::enable() {
     printf("ColorMusic enable.\n");
@@ -25,15 +35,16 @@ void ColorMusic::show() {
 //    vTaskDelay(5000);
 }
 
-void ColorMusic::setSampleRate(uint16_t sampleRate, ColorMusic *thisPointer) {
-    printf("sample rate new: %u \n", sampleRate);
-    thisPointer->fftConfig.frequencyStep = 1/((float) SAMPLES_SIZE/ (float) sampleRate);
-    printf("set frequencyStep: %f \n", thisPointer->fftConfig.frequencyStep);
-    if (thisPointer->fft != nullptr) thisPointer->setConfigFFT(thisPointer->fftConfig);
+void ColorMusic::setSampleRate(uint16_t sampleRate, void *thisPointer) {
+    ColorMusic &object = *(ColorMusic*)thisPointer;
+    printf("[%lu] new sample rate: %u \n", millis(), sampleRate);
+    object.fftConfig.frequencyStep = 1/((float) SAMPLES_SIZE/ (float) sampleRate);
+    if (object.fft != nullptr) object.setConfigFFT(object.fftConfig);
 }
 
-void ColorMusic::addSamples(const uint8_t *data, uint32_t length, ColorMusic *thisPointer) {
-    if (thisPointer->fft != nullptr) thisPointer->fft->addSamples(data, length);
+void ColorMusic::addSamples(const uint8_t *data, uint32_t length, void *thisPointer) {
+    ColorMusic &object = *(ColorMusic*)thisPointer;
+    if (object.fft != nullptr) object.fft->addSamples(data, length);
 }
 
 FFTConfig ColorMusic::getConfigFFT() {
