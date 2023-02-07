@@ -23,6 +23,7 @@ void SerialPortInteraction::start() {
 void SerialPortInteraction::stop() {
     if (handleSendTask == nullptr) return;
     vTaskDelete(handleSendTask);
+    handleSendTask = nullptr;
 }
 
 [[noreturn]] void SerialPortInteraction::sendTask(void *thisPointer) {
