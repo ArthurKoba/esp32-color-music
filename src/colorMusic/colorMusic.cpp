@@ -47,6 +47,10 @@ void ColorMusic::showTask(void *context) {
     ColorMusic &object = *(ColorMusic*)context;
     while (true) {
         if (xTaskNotifyWait(0, 0, 0, portMAX_DELAY) != pdPASS) continue;
+        for (int i = 0; i < AMPLITUDES_SIZE; ++i) {
+            object.amplitudesLeft[i] = (uint16_t) object.fft->amplitudes.left[i] >> 6;
+            object.amplitudesRight[i] = (uint16_t) object.fft->amplitudes.right[i] >> 6;
+        }
         object.show();
     }
 }
@@ -73,13 +77,6 @@ void ColorMusic::setConfigFFT(FFTConfig &config) {
 }
 
 void ColorMusic::show() {
-    if (fft == nullptr) return;
-    uint8_t amplitudesLeft[AMPLITUDES_SIZE];
-    uint8_t amplitudesRight[AMPLITUDES_SIZE];
-    for (int i = 0; i < AMPLITUDES_SIZE; ++i) {
-        amplitudesLeft[i] = (uint16_t) fft->amplitudes.left[i] >> 6;
-        amplitudesRight[i] = (uint16_t) fft->amplitudes.right[i] >> 6;
-    }
 
     uint8_t low = 0;
     uint8_t middle;
