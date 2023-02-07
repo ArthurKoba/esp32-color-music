@@ -48,6 +48,7 @@ void SerialPortInteraction::stop() {
 
 
 void SerialPortInteraction::send(Packet &packet) {
+    if (handleSendTask == nullptr) return;
     xQueueOverwrite(packetQueue, &packet);
     xTaskNotify(handleSendTask, 0, eSetValueWithOverwrite);
 }
