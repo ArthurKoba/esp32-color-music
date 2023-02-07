@@ -44,7 +44,7 @@ struct FFTConfig {
 
 class FFTColorMusic {
 public:
-    explicit FFTColorMusic(FFTConfig &config);
+    explicit FFTColorMusic(FFTConfig &config, TaskHandle_t &handleEndCalculatePointer);
     ~FFTColorMusic();
 
     void addSamples(const uint8_t *data, uint32_t length);
@@ -65,6 +65,7 @@ private:
     float *fftWindow;
     float buffer[SAMPLES_SIZE * 2] __attribute__((aligned(16))){};
     float *fftTable;
+    TaskHandle_t &handleEndCalculate;
     FFTConfig cfg;
     TaskHandle_t fftTask = nullptr;
 };

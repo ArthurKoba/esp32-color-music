@@ -1,6 +1,6 @@
 #include "fft.h"
 
-FFTColorMusic::FFTColorMusic(FFTConfig &config) {
+FFTColorMusic::FFTColorMusic(FFTConfig &config, TaskHandle_t &handleEnd) : handleEndCalculate(handleEnd) {
     printf("[%lu] Constructor FFTColorMusic\n", millis());
     fftTable = new float[SAMPLES_SIZE];
     dsps_fft2r_init_fc32(fftTable, SAMPLES_SIZE);
@@ -97,7 +97,7 @@ void FFTColorMusic::setConfigs(FFTConfig &newCfg) {
         object.calcFFT(object.samples.left, object.amplitudes.left);
         object.calcFFT(object.samples.right, object.amplitudes.right);
 //        printf("[%lu] fftExecutor | end calculating fft\n", millis());
-//        xTaskNotify(actualColorMusic->colorsTask, 0, eNoAction); // todo execute result
+        xTaskNotify(object.handleEndCalculate, 0, eNoAction);
     }
 }
 
