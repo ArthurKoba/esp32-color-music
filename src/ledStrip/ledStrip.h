@@ -6,6 +6,7 @@
 #define ESP32_COLOR_MUSIC_LEDSTRIP_H
 
 #include "FastLED.h"
+#include "configs.h"
 
 enum NotificationLedStrip : uint8_t {
     SET_COLOR, SET_LEDS

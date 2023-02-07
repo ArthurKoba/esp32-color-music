@@ -12,7 +12,7 @@
 #include "FastLED.h"
 #include "esp_dsp.h"
 #include "cmath"
-
+#include "configs.h"
 
 enum AmplitudesType : uint8_t {
     LIN, LOG, BARK, CUSTOM_BARK

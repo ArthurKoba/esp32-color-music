@@ -2,6 +2,7 @@
 #define ESP32_COLOR_MUSIC_COLORMUSIC_H
 
 #include <cstdio>
+#include "configs.h"
 #include "ledStrip/customLedStrip.h"
 #include "fft.h"
 #include "CustomBluetoothA2DPSink.h"

@@ -15,9 +15,9 @@ void LedStrip::start(CRGB *ledsPointer, uint16_t ledsLength) {
     xTaskCreate(
             LedStrip::sendExecutor,
             "LedStripExecutor",
-            2048,
+            LED_STRIP_TASK_STACK_SIZE,
             this,
-            9, // todo setting old
+            LED_STRIP_TASK_PRIORITY,
             &handleShowTask);
 }
 

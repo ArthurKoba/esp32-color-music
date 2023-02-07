@@ -20,6 +20,18 @@
 #define DEFAULT_MODE COLOR_MUSIC_MODE
 #define BRIGHT_STEP 10
 
+#define FFT_TASK_PRIORITY 14
+#define FFT_TASK_STACK_SIZE 2048
+
+#define LED_STRIP_TASK_PRIORITY 5
+#define LED_STRIP_TASK_STACK_SIZE 2048
+
+#define COLOR_MUSIC_TASK_PRIORITY 13
+#define COLOR_MUSIC_TASK_STACK_SIZE 2048
+
+#define SERIAL_PORT_INTERACTION_TASK_PRIORITY 0
+#define SERIAL_PORT_INTERACTION_TASK_STACK_SIZE 2048
+
 #define NO_LED_FEEDBACK_CODE // remove warning IRRemote: No definition for LED_BUILTIN found -> default LED feedback is disabled.
 #define SEND_PWM_BY_TIMER // remove warning IRRemote: For ESP32, RP2040, mbed and particle boards SEND_PWM_BY_TIMER is enabled by default.
 #define FASTLED_INTERNAL // remove warning FastLED: No hardware SPI pins defined.  All SPI access will default to bitbanged output

@@ -14,9 +14,9 @@ void SerialPortInteraction::start() {
     xTaskCreate(
             SerialPortInteraction::sendTask,
             "SerialPortInteraction",
-            2048,
+            SERIAL_PORT_INTERACTION_TASK_STACK_SIZE,
             this,
-            4,
+            SERIAL_PORT_INTERACTION_TASK_PRIORITY,
             &handleSendTask);
 }
 

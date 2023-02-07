@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include "Arduino.h"
+#include "configs.h"
 
 enum PacketType : uint8_t {
     FFT_FLOAT = 21, FFT_BYTE = 22

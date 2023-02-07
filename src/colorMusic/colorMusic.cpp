@@ -33,9 +33,9 @@ void ColorMusic::enable() {
     xTaskCreate(
             ColorMusic::showTask,
             "ColorMusicTask",
-            2048,
+            COLOR_MUSIC_TASK_STACK_SIZE,
             this,
-            5,
+            COLOR_MUSIC_TASK_PRIORITY,
             &handleColorMusic);
     this->fft = new FFTColorMusic(fftConfig, handleColorMusic);
 }

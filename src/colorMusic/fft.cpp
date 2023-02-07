@@ -25,9 +25,9 @@ FFTColorMusic::FFTColorMusic(FFTConfig &config, TaskHandle_t &handleEnd) : handl
 
     xTaskCreate(FFTColorMusic::fftExecutor,
                 "FFTcolorMusic",
-                2048,
+                FFT_TASK_STACK_SIZE,
                 this,
-                13,
+                FFT_TASK_PRIORITY,
                 &handleFFTTask);
 }
 
