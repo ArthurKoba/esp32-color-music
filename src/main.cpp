@@ -24,6 +24,7 @@ void setup() {
     a2dp_sink.start(BLUETOOTH_DEVICE_NAME);
     serialPortInteraction.start();
     control.setup();
+    control.setSerialPortInteraction(&serialPortInteraction);
     control.setLedStrip((LedStrip*)&strip);
     control.setColorModes(&colorModes);
     control.setColorMusic(&colorMusic);

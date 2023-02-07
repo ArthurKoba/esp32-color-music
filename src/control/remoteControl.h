@@ -5,6 +5,7 @@
 #include "Arduino.h" // from import uint16_t and another types
 #include "colorModes/colorModes.h"
 #include "ledStrip/ledStrip.h"
+#include "serialPortInteraction/serialPortInteraction.h"
 
 
 #ifndef IR_RECEIVE_PIN
@@ -27,6 +28,7 @@ public:
     void setColorModes(ColorModes *colorModesPointer);
     void setLedStrip(LedStrip *stripPointer);
     void setColorMusic(ColorMusic *colorMusicPointer);
+    void setSerialPortInteraction(SerialPortInteraction *serialPortInteractionPointer);
 
     void handleCommands();
 private:
@@ -36,6 +38,7 @@ private:
     ColorMusic *colorMusic;
     ColorModes *colorModes;
     LedStrip *strip;
+    SerialPortInteraction *serialPortInteraction;
 };
 
 #endif //ESP32_COLOR_MUSIC_REMOTECONTROL_H
