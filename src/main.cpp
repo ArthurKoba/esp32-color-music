@@ -16,13 +16,13 @@ void setup() {
     CFastLED::addLeds<WS2812B, WS2812B_PIN, GRB>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
     strip.start(leds, NUM_LEDS);
     strip.setBrightness(100);
-    colorModes.setMode(COLOR_MUSIC_MODE);
+    colorMusic.setSerialPortInteraction(&serialPortInteraction);
     colorMusic.setupCallbacks(&a2dp_sink);
+    colorModes.setMode(COLOR_MUSIC_MODE);
     a2dp_sink.set_pin_config(i2sPins);
     a2dp_sink.set_volume(64);
 ////    a2dp_sink.set_task_core(0);
     a2dp_sink.start(BLUETOOTH_DEVICE_NAME);
-    serialPortInteraction.start();
     control.setup();
     control.setSerialPortInteraction(&serialPortInteraction);
     control.setLedStrip((LedStrip*)&strip);

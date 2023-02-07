@@ -5,6 +5,7 @@
 #include "ledStrip/customLedStrip.h"
 #include "fft.h"
 #include "CustomBluetoothA2DPSink.h"
+#include "serialPortInteraction/serialPortInteraction.h"
 
 class ColorMusic {
 public:
@@ -19,6 +20,9 @@ public:
 
     FFTConfig getConfigFFT();
     void setConfigFFT(FFTConfig &config);
+
+    void setSerialPortInteraction(SerialPortInteraction *serialPortInteractionPointer);
+
 private:
     [[noreturn]] void static showTask(void *context);
     void show();
@@ -27,6 +31,7 @@ private:
     FFTConfig fftConfig;
     CustomLedStrip &strip;
     CustomBluetoothA2DPSink *a2dp = nullptr;
+    SerialPortInteraction *serialPortInteraction;
     uint8_t amplitudesLeft[AMPLITUDES_SIZE];
     uint8_t amplitudesRight[AMPLITUDES_SIZE];
 };

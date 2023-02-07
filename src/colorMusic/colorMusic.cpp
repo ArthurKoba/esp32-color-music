@@ -21,6 +21,11 @@ void ColorMusic::setupCallbacks(CustomBluetoothA2DPSink *a2dpPointer) {
 //    a2dp_sink.set_avrc_metadata_callback(callbackAVRCMetadata);
 }
 
+void ColorMusic::setSerialPortInteraction(SerialPortInteraction *serialPortInteractionPointer) {
+    this->serialPortInteraction = serialPortInteractionPointer;
+}
+
+
 void ColorMusic::enable() {
     if (this->fft != nullptr) return;
     printf("[%lu] ColorMusic enable.\n", millis());
@@ -47,6 +52,8 @@ void ColorMusic::showTask(void *context) {
     ColorMusic &object = *(ColorMusic*)context;
     while (true) {
         if (xTaskNotifyWait(0, 0, 0, portMAX_DELAY) != pdPASS) continue;
+        if (object.serialPortInteraction != nullptr)
+            object.serialPortInteraction->sendAmplitudes(object.fft->amplitudes.left, AMPLITUDES_SIZE);
         for (int i = 0; i < AMPLITUDES_SIZE; ++i) {
             object.amplitudesLeft[i] = (uint16_t) object.fft->amplitudes.left[i] >> 6;
             object.amplitudesRight[i] = (uint16_t) object.fft->amplitudes.right[i] >> 6;
