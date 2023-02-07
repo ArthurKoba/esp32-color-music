@@ -7,6 +7,7 @@ ColorMusic colorMusic(strip);
 ColorModes colorModes(strip, colorMusic);
 RemoteControl control;
 CustomBluetoothA2DPSink a2dp_sink;
+SerialPortInteraction serialPortInteraction;
 
 
 void setup() {
@@ -21,6 +22,7 @@ void setup() {
     a2dp_sink.set_volume(64);
 ////    a2dp_sink.set_task_core(0);
     a2dp_sink.start(BLUETOOTH_DEVICE_NAME);
+    serialPortInteraction.start();
     control.setup();
     control.setLedStrip((LedStrip*)&strip);
     control.setColorModes(&colorModes);
