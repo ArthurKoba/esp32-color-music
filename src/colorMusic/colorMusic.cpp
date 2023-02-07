@@ -1,6 +1,8 @@
 #include "colorMusic.h"
 
-ColorMusic::ColorMusic() {
+ColorMusic::ColorMusic(CustomLedStrip &targetStrip) : strip(targetStrip) {
+
+}
 
 ColorMusic::~ColorMusic() {
     if (a2dp == nullptr) return;

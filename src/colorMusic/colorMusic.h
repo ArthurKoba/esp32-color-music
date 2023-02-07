@@ -2,12 +2,13 @@
 #define ESP32_COLOR_MUSIC_COLORMUSIC_H
 
 #include <cstdio>
+#include "ledStrip/customLedStrip.h"
 #include "fft.h"
 #include "CustomBluetoothA2DPSink.h"
 
 class ColorMusic {
 public:
-    ColorMusic();
+    explicit ColorMusic(CustomLedStrip &targetStrip);
     void enable();
     ~ColorMusic();
     void disable();
@@ -21,6 +22,7 @@ public:
 private:
     FFTColorMusic *fft = nullptr;
     FFTConfig fftConfig;
+    CustomLedStrip &strip;
     CustomBluetoothA2DPSink *a2dp = nullptr;
 };
 
