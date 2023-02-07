@@ -36,11 +36,13 @@ struct Amplitudes {
     float right[AMPLITUDES_SIZE]{};
 };
 
+
 struct FFTConfig {
     AmplitudesType amplitudesType = LIN;
     WindowType windowType = NO_WINDOW;
     float frequencyStep = 0.0;
 };
+
 
 class FFTColorMusic {
 public:
@@ -51,6 +53,8 @@ public:
     void setConfigs(FFTConfig &config);
     uint16_t static getDeltaMinMaxSample(const int16_t *samples);
     uint32_t static getMaxObjectSize();
+    Samples samples;
+    Amplitudes amplitudes;
 
 private:
     [[noreturn]] void static fftExecutor(void *thisPointer);
@@ -59,15 +63,13 @@ private:
     void generateBarkScale(float frequencyStep);
     void generateCustomBarkScale(float frequencyStep);
 
-    Samples samples;
-    Amplitudes amplitudes;
     float *barkScale;
     float *fftWindow;
     float buffer[SAMPLES_SIZE * 2] __attribute__((aligned(16))){};
     float *fftTable;
     TaskHandle_t &handleEndCalculate;
     FFTConfig cfg;
-    TaskHandle_t fftTask = nullptr;
+    TaskHandle_t handleFFTTask = nullptr;
 };
 
 #endif //ESP32_COLOR_MUSIC_FFT_H

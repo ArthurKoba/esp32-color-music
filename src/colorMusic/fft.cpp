@@ -28,12 +28,12 @@ FFTColorMusic::FFTColorMusic(FFTConfig &config, TaskHandle_t &handleEnd) : handl
                 2048,
                 this,
                 13,
-                &fftTask);
+                &handleFFTTask);
 }
 
 FFTColorMusic::~FFTColorMusic() {
     printf("[%lu] Destructor FFTColorMusic\n", millis());
-    vTaskDelete(fftTask);
+    vTaskDelete(handleFFTTask);
     if (cfg.windowType != NO_WINDOW) {
         printf("[%lu] freeing window memory\n", millis());
         delete fftWindow;
@@ -104,7 +104,6 @@ void FFTColorMusic::setConfigs(FFTConfig &newCfg) {
 
 
 void FFTColorMusic::addSamples(const uint8_t *data, uint32_t length) {
-    printf("[%lu] Getting samples, adding to the sample window\n", millis());
     length = length/4;
     auto frame = (Frame*)data;
 
@@ -133,7 +132,7 @@ void FFTColorMusic::addSamples(const uint8_t *data, uint32_t length) {
             samples.right[SAMPLES_SIZE - 1 - samples.fullness] = frame[length - 1 - samples.fullness].channel2;
         }
     }
-    if (samples.fullness == SAMPLES_SIZE) xTaskNotify(fftTask, 0, eNoAction);
+    if (samples.fullness == SAMPLES_SIZE) xTaskNotify(handleFFTTask, 0, eNoAction);
 }
 
 void FFTColorMusic::calcFFT(const int16_t *samplesIn, float *amplitudeOut) {
