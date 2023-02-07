@@ -30,8 +30,6 @@ void setup() {
 void loop() {
     control.handleCommands();
     colorModes.show();
-//    execEncoder(a2dp_sink);
-//    execIrCommandTest(colorMusic);
 }
 
 
