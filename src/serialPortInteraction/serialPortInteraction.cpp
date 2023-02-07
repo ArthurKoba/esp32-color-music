@@ -5,12 +5,12 @@ SerialPortInteraction::SerialPortInteraction() {
 };
 
 SerialPortInteraction::~SerialPortInteraction() {
+    stop();
     vQueueDelete(packetQueue);
-    if (handleSendTask == nullptr) return;
-    vTaskDelete(handleSendTask);
 };
 
 void SerialPortInteraction::start() {
+    if (handleSendTask != nullptr) return;
     xTaskCreate(
             SerialPortInteraction::sendTask,
             "SerialPortInteraction",
@@ -18,6 +18,11 @@ void SerialPortInteraction::start() {
             this,
             4,
             &handleSendTask);
+}
+
+void SerialPortInteraction::stop() {
+    if (handleSendTask == nullptr) return;
+    vTaskDelete(handleSendTask);
 }
 
 [[noreturn]] void SerialPortInteraction::sendTask(void *thisPointer) {

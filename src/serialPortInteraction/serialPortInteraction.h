@@ -35,6 +35,7 @@ public:
     void sendAmplitudes(float *values, uint16_t length);
     void sendAmplitudes(uint8_t *values, uint16_t length);
     void start();
+    void stop();
 private:
     [[noreturn]] void static sendTask(void *thisPointer);
     TaskHandle_t handleSendTask = nullptr;
