@@ -1,7 +1,8 @@
 #include "colorMusic.h"
 
 ColorMusic::ColorMusic(CustomLedStrip &targetStrip) : strip(targetStrip) {
-
+    fftConfig.amplitudesType = BARK;
+    fftConfig.windowType = NUTTALL;
 }
 
 ColorMusic::~ColorMusic() {
