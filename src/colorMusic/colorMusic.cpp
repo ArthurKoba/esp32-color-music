@@ -22,20 +22,33 @@ void ColorMusic::setupCallbacks(CustomBluetoothA2DPSink *a2dpPointer) {
 }
 
 void ColorMusic::enable() {
-    printf("ColorMusic enable.\n");
-    this->fft = new FFTColorMusic(fftConfig);
+    if (this->fft != nullptr) return;
+    printf("[%lu] ColorMusic enable.\n", millis());
 //    printf("free memory after create: %i\n", ESP.getFreeHeap());
+    xTaskCreate(
+            ColorMusic::showTask,
+            "ColorMusicTask",
+            2048,
+            this,
+            5,
+            &handleColorMusic);
+    this->fft = new FFTColorMusic(fftConfig, handleColorMusic);
 }
 
 void ColorMusic::disable() {
-    printf("ColorMusic disable.\n");
+    printf("[%lu] ColorMusic disable.\n", millis());
     delete this->fft;
     fft = nullptr;
+    vTaskDelete(handleColorMusic);
 //    printf("free memory after delete: %i\n", ESP.getFreeHeap());
 }
 
-void ColorMusic::show() {
-//    vTaskDelay(5000);
+void ColorMusic::showTask(void *context) {
+    ColorMusic &object = *(ColorMusic*)context;
+    while (true) {
+        if (xTaskNotifyWait(0, 0, 0, portMAX_DELAY) != pdPASS) continue;
+        object.show();
+    }
 }
 
 void ColorMusic::setSampleRate(uint16_t sampleRate, void *thisPointer) {
@@ -57,4 +70,70 @@ FFTConfig ColorMusic::getConfigFFT() {
 void ColorMusic::setConfigFFT(FFTConfig &config) {
     if (fft != nullptr) fft->setConfigs(config);
     fftConfig = config;
+}
+
+void ColorMusic::show() {
+    if (fft == nullptr) return;
+    uint8_t amplitudesLeft[AMPLITUDES_SIZE];
+    uint8_t amplitudesRight[AMPLITUDES_SIZE];
+    for (int i = 0; i < AMPLITUDES_SIZE; ++i) {
+        amplitudesLeft[i] = (uint16_t) fft->amplitudes.left[i] >> 6;
+        amplitudesRight[i] = (uint16_t) fft->amplitudes.right[i] >> 6;
+    }
+
+    uint8_t low = 0;
+    uint8_t middle;
+    uint8_t high;
+    auto startLowIndex = (uint16_t) (150/fftConfig.frequencyStep);
+    auto endLowIndex = (uint16_t) (150/fftConfig.frequencyStep);
+    auto startMiddleIndex = (uint16_t) (600/fftConfig.frequencyStep);
+    auto endMiddleIndex = (uint16_t) (1500/fftConfig.frequencyStep);
+    auto startHighIndex = (uint16_t) (10000/fftConfig.frequencyStep);
+    auto endHighIndex = (uint16_t) (20000/fftConfig.frequencyStep);
+
+    low = amplitudesLeft[7];
+//    for (auto i = startLowIndex; i < endLowIndex; ++i) {
+//        if (amplitudes[i] > low) low = amplitudes[i];
+//    }
+//
+    uint32_t sum = 0;
+    for (auto i = startMiddleIndex; i < endMiddleIndex; ++i) {
+        sum += amplitudesLeft[i];
+    }
+    middle = sum/(endMiddleIndex - startMiddleIndex);
+    sum = 0;
+    for (auto i = startHighIndex; i < endHighIndex; ++i) {
+        sum += amplitudesLeft[i];
+    }
+    high = sum/(endHighIndex - startHighIndex);
+//
+    int index = 0;
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 9; j++) {
+            switch (i) {
+                case 0:
+                    strip.leds[index].setRGB(low, 0, 0);
+                    strip.leds[229-index].setRGB(low, 0, 0);
+                    break;
+                case 1:
+                    strip.leds[index].setRGB(0, middle, 0);
+                    strip.leds[229-index].setRGB(0, middle, 0);
+                    break;
+                case 2:
+                    strip.leds[index].setRGB(0, 0, high);
+                    strip.leds[229-index].setRGB(0, 0, high);
+                    break;
+            }
+            index += 1;
+        }
+    }
+//
+////    if ((millis() - timeLastShow) > 25) {
+    for (int i = 28; i < 115; i++) strip.leds[i-1] = strip.leds[i];
+    for (int i = 202; i > 114; i--) strip.leds[i] = strip.leds[i-1];
+    strip.leds[114].setRGB(low, middle, high);
+    strip.leds[115].setRGB(low, middle, high);
+////        timeLastShow = millis();
+////    }
+    strip.show();
 }

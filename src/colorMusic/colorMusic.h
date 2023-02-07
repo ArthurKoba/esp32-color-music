@@ -20,7 +20,10 @@ public:
     FFTConfig getConfigFFT();
     void setConfigFFT(FFTConfig &config);
 private:
+    [[noreturn]] void static showTask(void *context);
+    void show();
     FFTColorMusic *fft = nullptr;
+    TaskHandle_t handleColorMusic = nullptr;
     FFTConfig fftConfig;
     CustomLedStrip &strip;
     CustomBluetoothA2DPSink *a2dp = nullptr;
