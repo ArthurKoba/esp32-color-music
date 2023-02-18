@@ -26,7 +26,8 @@ struct Packet {
     PacketType type = FFT_BYTE;
     uint16_t length = 0;
     void *data = nullptr;
-};
+} __attribute__((packed));
+
 
 class SerialPortInteraction {
 public:
