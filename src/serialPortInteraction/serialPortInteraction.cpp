@@ -96,5 +96,6 @@ void SerialPortInteraction::packetCobsSender(Packet &packet) {
     }
     *code_ptr = dst - code_ptr;
     Serial.write(buffer, dst - buffer);
+    Serial.write(delimiter);
     delete[] buffer;
 }
