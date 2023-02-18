@@ -28,21 +28,11 @@ void SerialPortInteraction::stop() {
 
 [[noreturn]] void SerialPortInteraction::sendTask(void *thisPointer) {
     SerialPortInteraction &object = *(SerialPortInteraction*)thisPointer;
-    uint32_t deltaTimeMs;
     while (true) {
         if (xTaskNotifyWait(0, 0, 0, portMAX_DELAY) != pdPASS) continue;
         Packet packet;
         xQueueReceive(object.packetQueue, &packet, 0);
-        deltaTimeMs = millis();
-        Serial.write((char*)&packet.type, 1);
-        Serial.write((char*)&packet.length, 2);
-        Serial.write((char*)packet.data, packet.length);
-        deltaTimeMs = millis() - deltaTimeMs;
-        auto lastTimeSend = (uint8_t) deltaTimeMs;
-        Serial.write((char*)&lastTimeSend, 1);
-        Serial.write('\n');
-        Serial.write((char)170);
-        Serial.write('\n');
+        object.packetCobsSender(packet);
     }
 }
 
@@ -61,4 +51,50 @@ void SerialPortInteraction::sendAmplitudes(float *values, uint16_t length) {
 void SerialPortInteraction::sendAmplitudes(uint8_t *values, uint16_t length) {
     Packet packet(FFT_BYTE, length, values);
     send(packet);
+}
+
+void SerialPortInteraction::packetCobsSender(Packet &packet) {
+    uint8_t delimiter = 10;
+    uint8_t code = 1;
+    uint8_t debt = 255;
+    auto *buffer = new uint8_t[debt];
+
+    uint8_t *dst = buffer;
+    uint8_t *code_ptr = dst++;
+
+    auto *ptr = (uint8_t*)&packet;
+    for (int i = 1; i < 4; ++i) {
+        uint8_t character = *ptr++;
+        if (character != delimiter) {
+            *dst++ = character;
+            code++;
+
+        } else {
+            *code_ptr = code;
+            Serial.write(buffer, dst - buffer);
+            code = 1;
+            dst = buffer;
+            code_ptr = dst++;
+        }
+    }
+
+    ptr = (uint8_t*)packet.data;
+    for (uint16_t i = 0; i < packet.length; ++i) {
+        uint8_t character = *ptr++;
+        if (character != delimiter && dst - buffer < debt) {
+            *dst++ = character;
+            code++;
+        } else {
+            if (dst - debt == buffer) { *ptr--; i--;};
+            if (delimiter != 0 && code == delimiter) code = 0;
+            *code_ptr = code;
+            Serial.write(buffer, dst - buffer);
+            code = 1;
+            dst = buffer;
+            code_ptr = dst++;
+        }
+    }
+    *code_ptr = dst - code_ptr;
+    Serial.write(buffer, dst - buffer);
+    delete[] buffer;
 }

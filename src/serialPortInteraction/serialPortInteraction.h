@@ -38,6 +38,7 @@ public:
     void start();
     void stop();
 private:
+    void packetCobsSender(Packet &packet);
     [[noreturn]] void static sendTask(void *thisPointer);
     TaskHandle_t handleSendTask = nullptr;
     QueueHandle_t packetQueue = nullptr;
