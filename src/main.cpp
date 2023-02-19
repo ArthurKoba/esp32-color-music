@@ -37,9 +37,10 @@ void setup() {
     uint8_t data[length];
     for (int i = 0; i < length; ++i) data[i] = i;
     Packet packet;
-    packet.type = FFT_BYTE;
-    packet.length = sizeof(data);
-    packet.data = data;
+    packet.number = 22;
+    packet.dataType = UINT8_T;
+    packet.dataLength = sizeof(data);
+    packet.dataPointer = data;
 
     while (true) {
         serialPortInteraction.send(packet);
