@@ -5,27 +5,28 @@
 #include "Arduino.h"
 #include "configs.h"
 
-enum PacketType : uint8_t {
-    FFT_FLOAT = 21, FFT_BYTE = 22
+enum PacketDataType : uint8_t {
+    NONE_T = 0, STRUCT_T = 1,
+    INT8_T = 2, UINT8_T = 3,
+    INT16_T = 4, UINT16_T = 5,
+    INT32_T = 6, UINT32_T = 7,
+    FLOAT32_T = 8, FLOAT64_T = 9, TEST = 10
 };
 
 struct Packet {
-
-    Packet(PacketType type, uint16_t length, void *dataPointer) {
-        this->type = type;
-        this->length = length;
-        this->data = dataPointer;
+    Packet(uint8_t number, PacketDataType dataType, uint16_t dataLength, void *dataPointer) {
+        this->number = number;
+        this->dataType = dataType;
+        this->dataLength = dataLength;
+        this->dataPointer = dataPointer;
     }
 
-    Packet() {
-        type = FFT_BYTE;
-        length = 0;
-        data = nullptr;
-    }
+    Packet() = default;
 
-    PacketType type = FFT_BYTE;
-    uint16_t length = 0;
-    void *data = nullptr;
+    uint8_t number = 0;
+    PacketDataType dataType = NONE_T;
+    uint16_t dataLength = 0;
+    void *dataPointer = nullptr;
 } __attribute__((packed));
 
 

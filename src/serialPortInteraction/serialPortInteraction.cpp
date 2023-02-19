@@ -44,42 +44,39 @@ void SerialPortInteraction::send(Packet &packet) {
 }
 
 void SerialPortInteraction::sendAmplitudes(float *values, uint16_t length) {
-    Packet packet(FFT_FLOAT, length * sizeof(float), values);
+    Packet packet(21, FLOAT32_T, length * sizeof(float), values);
     send(packet);
 }
 
 void SerialPortInteraction::sendAmplitudes(uint8_t *values, uint16_t length) {
-    Packet packet(FFT_BYTE, length, values);
+    Packet packet(22, UINT8_T,  length, values);
     send(packet);
 }
 
 void SerialPortInteraction::packetCobsSender(Packet &packet) {
     uint8_t delimiter = 10;
-    uint8_t code = 1;
     uint8_t debt = 255;
     auto *buffer = new uint8_t[debt];
 
+    uint8_t code = 1;
     uint8_t *dst = buffer;
     uint8_t *code_ptr = dst++;
 
     auto *ptr = (uint8_t*)&packet;
-    for (int i = 1; i < 4; ++i) {
+    for (int i = 0; i < 4; ++i) {
         uint8_t character = *ptr++;
         if (character != delimiter) {
             *dst++ = character;
             code++;
-
         } else {
             *code_ptr = code;
-            Serial.write(buffer, dst - buffer);
             code = 1;
-            dst = buffer;
             code_ptr = dst++;
         }
     }
 
-    ptr = (uint8_t*)packet.data;
-    for (uint16_t i = 0; i < packet.length; ++i) {
+    ptr = (uint8_t*)packet.dataPointer;
+    for (uint16_t i = 0; i < packet.dataLength; ++i) {
         uint8_t character = *ptr++;
         if (character != delimiter && dst - buffer < debt) {
             *dst++ = character;
