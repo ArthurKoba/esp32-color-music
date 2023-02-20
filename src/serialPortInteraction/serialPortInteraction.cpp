@@ -69,6 +69,7 @@ void SerialPortInteraction::packetCobsSender(Packet &packet) {
             *dst++ = character;
             code++;
         } else {
+            if (delimiter != 0 && code == delimiter) code = 0;
             *code_ptr = code;
             code = 1;
             code_ptr = dst++;
