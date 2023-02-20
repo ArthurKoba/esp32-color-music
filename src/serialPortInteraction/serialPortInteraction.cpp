@@ -83,7 +83,7 @@ void SerialPortInteraction::packetCobsSender(Packet &packet) {
             *dst++ = character;
             code++;
         } else {
-            if (dst - debt == buffer) { *ptr--; i--;};
+            if (dst - buffer == debt) { *ptr--; i--;};
             if (delimiter != 0 && code == delimiter) code = 0;
             *code_ptr = code;
             Serial.write(buffer, dst - buffer);
