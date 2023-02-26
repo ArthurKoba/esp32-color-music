@@ -1,17 +1,17 @@
 #define SERIAL_SPEED 1000000
 
-#define ENCODER_CLK_PIN 32
-#define ENCODER_DT_PIN 33
-#define ENCODER_BTN_PIN 27
+#define ENCODER_CLK_PIN 39
+#define ENCODER_DT_PIN 36
+#define ENCODER_BTN_PIN 34
 
-#define IR_RECEIVE_PIN 13
+#define IR_RECEIVE_PIN 27
 
-#define WS2812B_PIN 12
+#define WS2812B_PIN 4
 #define NUM_LEDS 230
 
-#define I2S_BCK_PIN 14
-#define I2S_DATA_OUT_PIN 25
-#define I2S_WS_PIN 26
+#define I2S_BCK_PIN 25
+#define I2S_DATA_OUT_PIN 33
+#define I2S_WS_PIN 32
 
 #define SAMPLES_SIZE 2048
 
