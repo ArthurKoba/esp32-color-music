@@ -8,6 +8,13 @@
 #include "CustomBluetoothA2DPSink.h"
 #include "serialPortInteraction/serialPortInteraction.h"
 
+
+struct ChannelBright {
+    uint8_t low = 0;
+    uint8_t middle = 0;
+    uint8_t high = 0;
+};
+
 class ColorMusic {
 public:
     explicit ColorMusic(CustomLedStrip &targetStrip);
@@ -27,6 +34,7 @@ public:
 private:
     [[noreturn]] void static showTask(void *context);
     void show();
+    ChannelBright calculateBrightFromChannel(const float *channel) const;
     FFTColorMusic *fft = nullptr;
     TaskHandle_t handleColorMusic = nullptr;
     FFTConfig fftConfig;

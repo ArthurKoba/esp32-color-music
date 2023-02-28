@@ -52,13 +52,10 @@ void ColorMusic::showTask(void *context) {
     ColorMusic &object = *(ColorMusic*)context;
     while (true) {
         if (xTaskNotifyWait(0, 0, 0, portMAX_DELAY) != pdPASS) continue;
-        if (object.serialPortInteraction != nullptr)
-            object.serialPortInteraction->sendAmplitudes(object.fft->amplitudes.left, AMPLITUDES_SIZE);
-        for (int i = 0; i < AMPLITUDES_SIZE; ++i) {
-            object.amplitudesLeft[i] = (uint16_t) object.fft->amplitudes.left[i] >> 6;
-            object.amplitudesRight[i] = (uint16_t) object.fft->amplitudes.right[i] >> 6;
-        }
         object.show();
+//        if (object.serialPortInteraction != nullptr)
+//            object.serialPortInteraction->sendAmplitudes(object.amplitudesRight, AMPLITUDES_SIZE);
+
     }
 }
 
@@ -85,59 +82,73 @@ void ColorMusic::setConfigFFT(FFTConfig &config) {
 
 void ColorMusic::show() {
 
-    uint8_t low = 0;
-    uint8_t middle;
-    uint8_t high;
-    auto startLowIndex = (uint16_t) (150/fftConfig.frequencyStep);
-    auto endLowIndex = (uint16_t) (150/fftConfig.frequencyStep);
-    auto startMiddleIndex = (uint16_t) (600/fftConfig.frequencyStep);
-    auto endMiddleIndex = (uint16_t) (1500/fftConfig.frequencyStep);
-    auto startHighIndex = (uint16_t) (10000/fftConfig.frequencyStep);
-    auto endHighIndex = (uint16_t) (20000/fftConfig.frequencyStep);
+    ChannelBright leftChannelBright = calculateBrightFromChannel(fft->amplitudes.left);
+    ChannelBright rightChannelBright = calculateBrightFromChannel(fft->amplitudes.right);
 
-    low = amplitudesLeft[7];
-//    for (auto i = startLowIndex; i < endLowIndex; ++i) {
-//        if (amplitudes[i] > low) low = amplitudes[i];
-//    }
-//
-    uint32_t sum = 0;
-    for (auto i = startMiddleIndex; i < endMiddleIndex; ++i) {
-        sum += amplitudesLeft[i];
-    }
-    middle = sum/(endMiddleIndex - startMiddleIndex);
-    sum = 0;
-    for (auto i = startHighIndex; i < endHighIndex; ++i) {
-        sum += amplitudesLeft[i];
-    }
-    high = sum/(endHighIndex - startHighIndex);
-//
     int index = 0;
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 9; j++) {
             switch (i) {
                 case 0:
-                    strip.leds[index].setRGB(low, 0, 0);
-                    strip.leds[229-index].setRGB(low, 0, 0);
+                    strip.leds[index].setRGB(leftChannelBright.low, 0, 0);
+                    strip.leds[229-index].setRGB(rightChannelBright.low, 0, 0);
                     break;
                 case 1:
-                    strip.leds[index].setRGB(0, middle, 0);
-                    strip.leds[229-index].setRGB(0, middle, 0);
+                    strip.leds[index].setRGB(0, leftChannelBright.middle, 0);
+                    strip.leds[229-index].setRGB(0, rightChannelBright.middle, 0);
                     break;
                 case 2:
-                    strip.leds[index].setRGB(0, 0, high);
-                    strip.leds[229-index].setRGB(0, 0, high);
+                    strip.leds[index].setRGB(0, 0, leftChannelBright.high);
+                    strip.leds[229-index].setRGB(0, 0, rightChannelBright.high);
                     break;
             }
             index += 1;
         }
     }
-//
-////    if ((millis() - timeLastShow) > 25) {
     for (int i = 28; i < 115; i++) strip.leds[i-1] = strip.leds[i];
     for (int i = 202; i > 114; i--) strip.leds[i] = strip.leds[i-1];
-    strip.leds[114].setRGB(low, middle, high);
-    strip.leds[115].setRGB(low, middle, high);
-////        timeLastShow = millis();
-////    }
+    strip.leds[114].setRGB(leftChannelBright.low, leftChannelBright.middle, leftChannelBright.high);
+    strip.leds[115].setRGB(rightChannelBright.low, rightChannelBright.middle, rightChannelBright.high);
     strip.show();
+}
+
+ChannelBright ColorMusic::calculateBrightFromChannel(const float *channel) const {
+    ChannelBright bright;
+    auto startLowIndex = (uint16_t) (340/fftConfig.frequencyStep);
+    auto endLowIndex = (uint16_t) (400/fftConfig.frequencyStep);
+    auto startMiddleIndex = (uint16_t) (600/fftConfig.frequencyStep);
+    auto endMiddleIndex = (uint16_t) (1000/fftConfig.frequencyStep);
+    auto startHighIndex = (uint16_t) (10000/fftConfig.frequencyStep);
+    auto endHighIndex = (uint16_t) (20000/fftConfig.frequencyStep);
+
+
+    uint32_t sum = 0;
+
+//    for (auto i = startLowIndex; i < endLowIndex; ++i) {
+//        uint8_t targetLow = (uint16_t) channel[i] >> 6;
+//        if (targetLow > bright.low) bright.low = targetLow;
+//    }
+
+    bright.low = (uint16_t) channel[6] >> 7;
+
+    sum = 0;
+    for (auto i = startMiddleIndex; i < endMiddleIndex; ++i) {
+        sum += (uint16_t) channel[i] >> 6;
+    }
+    bright.middle = sum/(endMiddleIndex - startMiddleIndex);
+
+    sum = 0;
+    for (auto i = startHighIndex; i < endHighIndex; ++i) {
+        sum += (uint16_t) channel[i] >> 6;
+    }
+    bright.high = sum/(endHighIndex - startHighIndex);
+
+
+//    bright.low = getBrightCRT(bright.low);
+
+    // test crt correction for dynamic green leds
+    bright.middle = bright.middle > 0 ? (1 + (uint16_t)(bright.middle * bright.middle + 255)) >> 8 : 0;;
+    bright.high = ((uint16_t)bright.high) * 2;
+
+    return bright;
 }
