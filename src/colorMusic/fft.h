@@ -46,19 +46,19 @@ struct FFTConfig {
 
 class FFTColorMusic {
 public:
-    explicit FFTColorMusic(FFTConfig &config, TaskHandle_t &handleEndCalculatePointer);
+    explicit FFTColorMusic(FFTConfig &config);
     ~FFTColorMusic();
-
     void addSamples(const uint8_t *data, uint32_t length);
     void setConfigs(FFTConfig &config);
+    void calculate();
+
     uint16_t static getDeltaMinMaxSample(const int16_t *samples);
     uint32_t static getMaxObjectSize();
     Samples samples;
     Amplitudes amplitudes;
 
 private:
-    [[noreturn]] void static fftExecutor(void *thisPointer);
-    void calcFFT(const int16_t *samplesIn, float *amplitudeOut);
+    void calculateTarget(const int16_t *samplesIn, float *amplitudeOut);
     void generateWindow(WindowType type);
     void generateBarkScale(float frequencyStep);
     void generateCustomBarkScale(float frequencyStep);
@@ -67,9 +67,7 @@ private:
     float *fftWindow;
     float buffer[SAMPLES_SIZE * 2] __attribute__((aligned(16))){};
     float *fftTable;
-    TaskHandle_t &handleEndCalculate;
     FFTConfig cfg;
-    TaskHandle_t handleFFTTask = nullptr;
 };
 
 #endif //ESP32_COLOR_MUSIC_FFT_H

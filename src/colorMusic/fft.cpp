@@ -1,6 +1,6 @@
 #include "fft.h"
 
-FFTColorMusic::FFTColorMusic(FFTConfig &config, TaskHandle_t &handleEnd) : handleEndCalculate(handleEnd) {
+FFTColorMusic::FFTColorMusic(FFTConfig &config) {
     printf("[%lu] Constructor FFTColorMusic\n", millis());
     fftTable = new float[SAMPLES_SIZE];
     dsps_fft2r_init_fc32(fftTable, SAMPLES_SIZE);
@@ -22,18 +22,10 @@ FFTColorMusic::FFTColorMusic(FFTConfig &config, TaskHandle_t &handleEnd) : handl
     }
 
     cfg = config;
-
-    xTaskCreate(FFTColorMusic::fftExecutor,
-                "FFTcolorMusic",
-                FFT_TASK_STACK_SIZE,
-                this,
-                FFT_TASK_PRIORITY,
-                &handleFFTTask);
 }
 
 FFTColorMusic::~FFTColorMusic() {
 //    printf("[%lu] Destructor FFTColorMusic\n", millis());
-    vTaskDelete(handleFFTTask);
     if (cfg.windowType != NO_WINDOW) {
 //        printf("[%lu] freeing window memory\n", millis());
         delete fftWindow;
@@ -87,22 +79,6 @@ void FFTColorMusic::setConfigs(FFTConfig &newCfg) {
     cfg = newCfg;
 }
 
-
-[[noreturn]] void FFTColorMusic::fftExecutor(void *thisPointer) {
-    FFTColorMusic &object = *(FFTColorMusic*)thisPointer;
-//    printf("[%lu] Start FFT Executor\n", millis());
-    while (true) {
-        if (xTaskNotifyWait(0, 0, 0, portMAX_DELAY) != pdPASS) continue;
-//        printf("[%lu] fftExecutor | start calculating fft\n", millis());
-        object.calcFFT(object.samples.left, object.amplitudes.left);
-        object.calcFFT(object.samples.right, object.amplitudes.right);
-//        printf("[%lu] fftExecutor | end calculating fft\n", millis());
-        xTaskNotify(object.handleEndCalculate, 0, eNoAction);
-    }
-}
-
-
-
 void FFTColorMusic::addSamples(const uint8_t *data, uint32_t length) {
     length = length/4;
     auto frame = (Frame*)data;
@@ -132,10 +108,9 @@ void FFTColorMusic::addSamples(const uint8_t *data, uint32_t length) {
             samples.right[SAMPLES_SIZE - 1 - samples.fullness] = frame[length - 1 - samples.fullness].channel2;
         }
     }
-    if (samples.fullness == SAMPLES_SIZE) xTaskNotify(handleFFTTask, 0, eNoAction);
 }
 
-void FFTColorMusic::calcFFT(const int16_t *samplesIn, float *amplitudeOut) {
+void FFTColorMusic::calculateTarget(const int16_t *samplesIn, float *amplitudeOut) {
     // todo add mutex. maybe raise errors after change fft configs
     for (int i = 0; i < SAMPLES_SIZE; i++) {
         if (cfg.windowType != NO_WINDOW)
@@ -168,6 +143,11 @@ void FFTColorMusic::calcFFT(const int16_t *samplesIn, float *amplitudeOut) {
         if (amplitudeOut[i] < 0 || isinf(amplitudeOut[i]) || isnan(amplitudeOut[i]))
             amplitudeOut[i] = 0.0;
     }
+}
+
+void FFTColorMusic::calculate() {
+    calculateTarget(samples.left, amplitudes.left);
+    calculateTarget(samples.right, amplitudes.right);
 }
 
 void FFTColorMusic::generateBarkScale(float frequencyStep) {

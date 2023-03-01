@@ -37,7 +37,7 @@ void ColorMusic::enable() {
             this,
             COLOR_MUSIC_TASK_PRIORITY,
             &handleColorMusic);
-    this->fft = new FFTColorMusic(fftConfig, handleColorMusic);
+    this->fft = new FFTColorMusic(fftConfig);
 }
 
 void ColorMusic::disable() {
@@ -48,14 +48,15 @@ void ColorMusic::disable() {
 //    printf("free memory after delete: %i\n", ESP.getFreeHeap());
 }
 
-void ColorMusic::showTask(void *context) {
-    ColorMusic &object = *(ColorMusic*)context;
+void ColorMusic::showTask(void *thisPointer) {
+    ColorMusic &self = *(ColorMusic*)thisPointer;
     while (true) {
-        if (xTaskNotifyWait(0, 0, 0, portMAX_DELAY) != pdPASS) continue;
-        object.show();
-//        if (object.serialPortInteraction != nullptr)
-//            object.serialPortInteraction->sendAmplitudes(object.amplitudesRight, AMPLITUDES_SIZE);
-
+        if (xTaskNotifyWait(0, 0, 0, portMAX_DELAY) != pdPASS || self.fft->samples.fullness != SAMPLES_SIZE) continue;
+        self.fft->calculate();
+        self.show();
+//        if (self.serialPortInteraction != nullptr) {
+//            self.serialPortInteraction->sendAmplitudes(self.fft->amplitudes.left, AMPLITUDES_SIZE);
+//        }
     }
 }
 
@@ -67,8 +68,10 @@ void ColorMusic::setSampleRate(uint16_t sampleRate, void *thisPointer) {
 }
 
 void ColorMusic::addSamples(const uint8_t *data, uint32_t length, void *thisPointer) {
-    ColorMusic &object = *(ColorMusic*)thisPointer;
-    if (object.fft != nullptr) object.fft->addSamples(data, length);
+    ColorMusic &self = *(ColorMusic*)thisPointer;
+    if (self.fft == nullptr) return;
+    self.fft->addSamples(data, length);
+    xTaskNotify(self.handleColorMusic, 0, eNoAction);
 }
 
 FFTConfig ColorMusic::getConfigFFT() {

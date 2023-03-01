@@ -41,8 +41,6 @@ private:
     CustomLedStrip &strip;
     CustomBluetoothA2DPSink *a2dp = nullptr;
     SerialPortInteraction *serialPortInteraction;
-    uint8_t amplitudesLeft[AMPLITUDES_SIZE];
-    uint8_t amplitudesRight[AMPLITUDES_SIZE];
 };
 
 #endif //ESP32_COLOR_MUSIC_COLORMUSIC_H
