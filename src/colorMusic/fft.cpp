@@ -28,13 +28,13 @@ FFTColorMusic::~FFTColorMusic() {
 //    printf("[%lu] Destructor FFTColorMusic\n", millis());
     if (cfg.windowType != NO_WINDOW) {
 //        printf("[%lu] freeing window memory\n", millis());
-        delete fftWindow;
+        delete [] fftWindow;
     }
     if (cfg.amplitudesType == BARK || cfg.amplitudesType == CUSTOM_BARK) {
 //        printf("[%lu] freeing window memory bark scale\n", millis());
-        delete barkScale;
+        delete [] barkScale;
     }
-    delete fftTable;
+    delete [] fftTable;
 }
 
 void FFTColorMusic::setConfigs(FFTConfig &newCfg) {
@@ -50,7 +50,7 @@ void FFTColorMusic::setConfigs(FFTConfig &newCfg) {
 
     } else if (isWindowsGenerated && !isNeedWindow) {
 //        printf("[%lu] freeing window memory\n", millis());
-        delete fftWindow;
+        delete [] fftWindow;
     }
     if (isNeedWindow && newCfg.windowType != cfg.windowType) {
         generateWindow(newCfg.windowType);
@@ -66,7 +66,7 @@ void FFTColorMusic::setConfigs(FFTConfig &newCfg) {
 
     if (isBarkScaleGenerated && !isNeedBarkScale) {
 //        printf("[%lu] freeing window memory bark scale\n", millis());
-        delete barkScale;
+        delete [] barkScale;
     } else if (isNeedBarkScale && !isBarkScaleGenerated) {
 //        printf("[%lu] memory allocation for the bark scale\n", millis());
         this->barkScale = new float[AMPLITUDES_SIZE];
