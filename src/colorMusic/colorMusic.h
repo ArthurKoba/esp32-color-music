@@ -15,6 +15,12 @@ struct ChannelBright {
     uint8_t high = 0;
 };
 
+struct SamplesBuffer {
+    uint8_t *data;
+    uint32_t length;
+};
+
+
 class ColorMusic {
 public:
     explicit ColorMusic(CustomLedStrip &targetStrip);
@@ -35,6 +41,8 @@ private:
     [[noreturn]] void static showTask(void *context);
     void show();
     ChannelBright calculateBrightFromChannel(const float *channel) const;
+    uint16_t sampleRate = 0;
+    QueueHandle_t samplesQueue = nullptr;
     FFTColorMusic *fft = nullptr;
     TaskHandle_t handleColorMusic = nullptr;
     FFTConfig fftConfig;

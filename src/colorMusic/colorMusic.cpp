@@ -9,6 +9,7 @@ ColorMusic::~ColorMusic() {
     if (a2dp == nullptr) return;
     a2dp->set_raw_stream_reader(nullptr, nullptr);
     a2dp->set_sample_rate_callback(nullptr, nullptr);
+    disable();
 }
 
 void ColorMusic::setupCallbacks(CustomBluetoothA2DPSink *a2dpPointer) {
@@ -30,6 +31,7 @@ void ColorMusic::enable() {
     if (this->fft != nullptr) return;
     printf("[%lu] ColorMusic enable.\n", millis());
 //    printf("free memory after create: %i\n", ESP.getFreeHeap());
+    samplesQueue = xQueueCreate(10, sizeof(SamplesBuffer));
     xTaskCreate(
             ColorMusic::showTask,
             "ColorMusicTask",
@@ -42,21 +44,31 @@ void ColorMusic::enable() {
 
 void ColorMusic::disable() {
     printf("[%lu] ColorMusic disable.\n", millis());
-    delete this->fft;
-    fft = nullptr;
     vTaskDelete(handleColorMusic);
+    delete fft;
+    fft = nullptr;
+    SamplesBuffer buffer {};
+    while (uxQueueMessagesWaiting(samplesQueue)) {
+        xQueueReceive(samplesQueue, &buffer, 0);
+        delete [] buffer.data;
+    }
+    vQueueDelete(samplesQueue);
+
 //    printf("free memory after delete: %i\n", ESP.getFreeHeap());
 }
 
 void ColorMusic::showTask(void *thisPointer) {
     ColorMusic &self = *(ColorMusic*)thisPointer;
+    SamplesBuffer buffer {};
     while (true) {
-        if (xTaskNotifyWait(0, 0, 0, portMAX_DELAY) != pdPASS || self.fft->samples.fullness != SAMPLES_SIZE) continue;
+        if (xQueuePeek(self.samplesQueue, &buffer, portMAX_DELAY) != pdTRUE) continue;
+
+        self.fft->addSamples(buffer.data, buffer.length);
         self.fft->calculate();
         self.show();
-//        if (self.serialPortInteraction != nullptr) {
-//            self.serialPortInteraction->sendAmplitudes(self.fft->amplitudes.left, AMPLITUDES_SIZE);
-//        }
+
+        xQueueReceive(self.samplesQueue, &buffer, 0); // Get first buffer from queue
+        delete [] buffer.data; // free memory buffer.data
     }
 }
 
@@ -70,8 +82,11 @@ void ColorMusic::setSampleRate(uint16_t sampleRate, void *thisPointer) {
 void ColorMusic::addSamples(const uint8_t *data, uint32_t length, void *thisPointer) {
     ColorMusic &self = *(ColorMusic*)thisPointer;
     if (self.fft == nullptr) return;
-    self.fft->addSamples(data, length);
-    xTaskNotify(self.handleColorMusic, 0, eNoAction);
+    if (self.fft->samples.fullness != SAMPLES_SIZE) return self.fft->addSamples(data, length);
+    SamplesBuffer buffer {.data = new uint8_t[length], .length = length};
+    for (int i = 0; i < length; ++i) buffer.data[i] = data[i];
+    xQueueSend(self.samplesQueue, &buffer, 0);
+//    xTaskNotify(self.handleColorMusic, 0, eNoAction);
 }
 
 FFTConfig ColorMusic::getConfigFFT() {
