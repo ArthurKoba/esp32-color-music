@@ -83,6 +83,7 @@ void ColorMusic::addSamples(const uint8_t *data, uint32_t length, void *thisPoin
     ColorMusic &self = *(ColorMusic*)thisPointer;
     if (self.fft == nullptr) return;
     if (self.fft->samples.fullness != SAMPLES_SIZE) return self.fft->addSamples(data, length);
+    if (uxQueueSpacesAvailable(self.samplesQueue) == 0) return;
     SamplesBuffer buffer {.data = new uint8_t[length], .length = length};
     for (int i = 0; i < length; ++i) buffer.data[i] = data[i];
     xQueueSend(self.samplesQueue, &buffer, 0);
