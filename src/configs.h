@@ -6,7 +6,7 @@
 
 #define IR_RECEIVE_PIN 27
 
-#define WS2812B_PIN 4
+#define WS2812B_PIN 26
 #define NUM_LEDS 230
 
 #define I2S_BCK_PIN 25

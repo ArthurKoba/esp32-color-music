@@ -1,6 +1,3 @@
-#include "Arduino.h"
-#include <FastLED.h>
-
 #include "ledStrip/customLedStrip.h"
 #include "colorModes/colorModes.h"
 #include "control/remoteControl.h"
