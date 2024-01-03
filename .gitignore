@@ -1,4 +1,5 @@
 .pio
+.idea
 CMakeListsPrivate.txt
 cmake-build-*/ 
 lib
