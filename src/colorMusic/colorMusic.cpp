@@ -108,37 +108,6 @@ void ColorMusic::show() {
     ChannelBright leftChannelBright = calculateBrightFromChannel(fft->amplitudes.left);
     ChannelBright rightChannelBright = calculateBrightFromChannel(fft->amplitudes.right);
 
-//    int index = 0;
-//    for (int i = 0; i < 3; i++) {
-//        for (int j = 0; j < 9; j++) {
-//            switch (i) {
-//                case 0:
-//                    strip.leds[index].setRGB(leftChannelBright.low, 0, 0);
-//                    strip.leds[229-index].setRGB(rightChannelBright.low, 0, 0);
-//                    break;
-//                case 1:
-//                    strip.leds[index].setRGB(0, leftChannelBright.middle, 0);
-//                    strip.leds[229-index].setRGB(0, rightChannelBright.middle, 0);
-//                    break;
-//                case 2:
-//                    strip.leds[index].setRGB(0, 0, leftChannelBright.high);
-//                    strip.leds[229-index].setRGB(0, 0, rightChannelBright.high);
-//                    break;
-//            }
-//            index += 1;
-//        }
-//    }
-//    for (int i = 28; i < 115; i++) strip.leds[i-1] = strip.leds[i];
-//    for (int i = 202; i > 114; i--) strip.leds[i] = strip.leds[i-1];
-//    for (int i = 1; i < 115; i++) strip.leds[i-1] = strip.leds[i];
-//    for (int i = 230; i > 114; i--) strip.leds[i] = strip.leds[i-1];
-//    strip.leds[114].setRGB(leftChannelBright.low, leftChannelBright.middle, leftChannelBright.high);
-//    strip.leds[115].setRGB(rightChannelBright.low, rightChannelBright.middle, rightChannelBright.high);
-//    strip.show();
-
-
-
-    CRGB color{};
     uint32_t time = millis();
     bool needUpdateRed = false;
     bool needUpdateGreen = false;
@@ -159,23 +128,20 @@ void ColorMusic::show() {
         this->lastTimeBlue = time;
     }
 
-    for (int i = 1; i < 115; i++) {
-        color = strip->leds[i-1];
-        if (needUpdateRed) color.red = strip->leds[i].red;
-        if (needUpdateGreen) color.green = strip->leds[i].green;
-        if (needUpdateBlue) color.blue = strip->leds[i].blue;
-        strip->leds[i-1] = color;
-    }
-    for (int i = 230; i > 114; i--) {
-        color = strip->leds[i];
-        if (needUpdateRed) color.red = strip->leds[i-1].red;
-        if (needUpdateGreen) color.green = strip->leds[i-1].green;
-        if (needUpdateBlue) color.blue = strip->leds[i-1].blue;
-        strip->leds[i] = color;
-    }
+    strip->flowDown(needUpdateRed, needUpdateGreen, needUpdateBlue);
 
     strip->leds[114].setRGB(leftChannelBright.low, leftChannelBright.middle, leftChannelBright.high);
     strip->leds[115].setRGB(rightChannelBright.low, rightChannelBright.middle, rightChannelBright.high);
+
+    BottomEQData data;
+    data.red_left=leftChannelBright.low;
+    data.green_left=leftChannelBright.middle;
+    data.blue_left=leftChannelBright.high;
+    data.red_right=rightChannelBright.low;
+    data.green_right=rightChannelBright.middle;
+    data.blue_right=rightChannelBright.high;
+    strip->setBottomEQ(data);
+
     strip->show();
 
 }
