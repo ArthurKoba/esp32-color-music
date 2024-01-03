@@ -2,19 +2,17 @@
 
 FFTColorMusic::FFTColorMusic(FFTConfig &config) {
     printf("[%lu] Constructor FFTColorMusic\n", millis());
-    fftTable = new float[SAMPLES_SIZE];
     dsps_fft2r_init_fc32(fftTable, SAMPLES_SIZE);
-    samples.fullness = 0;
 
     if (config.windowType != NO_WINDOW) {
         printf("[%lu] memory allocation for the window\n", millis());
-        this->fftWindow = new float[SAMPLES_SIZE];
+        fftWindow = new float[SAMPLES_SIZE];
         generateWindow(config.windowType);
     }
 
-    if (config.amplitudesType == BARK || config.amplitudesType == CUSTOM_BARK) {
+    if (config.amplitudesType == BARK or config.amplitudesType == CUSTOM_BARK) {
         printf("[%lu] memory allocation for the bark scale\n", millis());
-        this->barkScale = new float[AMPLITUDES_SIZE];
+        barkScale = new float[AMPLITUDES_SIZE];
         if (config.amplitudesType == BARK)
             generateBarkScale(config.frequencyStep);
         else if (config.amplitudesType == CUSTOM_BARK)
@@ -26,98 +24,90 @@ FFTColorMusic::FFTColorMusic(FFTConfig &config) {
 
 FFTColorMusic::~FFTColorMusic() {
 //    printf("[%lu] Destructor FFTColorMusic\n", millis());
-    if (cfg.windowType != NO_WINDOW) {
-//        printf("[%lu] freeing window memory\n", millis());
-        delete [] fftWindow;
-    }
-    if (cfg.amplitudesType == BARK || cfg.amplitudesType == CUSTOM_BARK) {
-//        printf("[%lu] freeing window memory bark scale\n", millis());
-        delete [] barkScale;
-    }
-    delete [] fftTable;
+    delete[] fftWindow;
+    delete[] barkScale;
 }
 
 void FFTColorMusic::setConfigs(FFTConfig &newCfg) {
+    // todo need testing
     bool isNeedWindow = newCfg.windowType != NO_WINDOW;
-    bool isWindowsGenerated = cfg.windowType != NO_WINDOW;
+    bool isWindowGenerated = cfg.windowType != NO_WINDOW;
 
-    if (newCfg.windowType != cfg.windowType) {
-//        printf("[%lu] change window type from %i to %i\n", millis(), cfg.windowType, newCfg.windowType);
+    if (isNeedWindow and not fftWindow) this->fftWindow = new float[SAMPLES_SIZE];
+    else if (not isNeedWindow and fftWindow) {
+        printf("[%lu] freeing window memory\n", millis());
+        delete[] fftWindow;
+        fftWindow = nullptr;
     }
-    if (isNeedWindow && !isWindowsGenerated) {
-//        printf("[%lu] memory allocation for the window\n", millis());
-        this->fftWindow = new float[SAMPLES_SIZE];
+    if (isNeedWindow and newCfg.windowType != cfg.windowType) generateWindow(newCfg.windowType);
 
-    } else if (isWindowsGenerated && !isNeedWindow) {
-//        printf("[%lu] freeing window memory\n", millis());
-        delete [] fftWindow;
-    }
-    if (isNeedWindow && newCfg.windowType != cfg.windowType) {
-        generateWindow(newCfg.windowType);
-    }
+    bool isNeedBarkScale = newCfg.amplitudesType == BARK or newCfg.amplitudesType == CUSTOM_BARK;
+    bool isNeedUpdateBarkScale = (cfg.amplitudesType != newCfg.amplitudesType or newCfg.frequencyStep != cfg.frequencyStep);
 
-    bool isNeedBarkScale = newCfg.amplitudesType == BARK || newCfg.amplitudesType == CUSTOM_BARK;
-    bool isBarkScaleGenerated = cfg.amplitudesType == BARK || cfg.amplitudesType == CUSTOM_BARK;
-    bool isNeedUpdateBarkScale = (cfg.amplitudesType != newCfg.amplitudesType || newCfg.frequencyStep != cfg.frequencyStep);
-
-    if (newCfg.amplitudesType != cfg.amplitudesType) {
-//        printf("[%lu] changing the type of amplitudes from %i to %i\n", millis(), cfg.amplitudesType, newCfg.amplitudesType);
-    }
-
-    if (isBarkScaleGenerated && !isNeedBarkScale) {
-//        printf("[%lu] freeing window memory bark scale\n", millis());
-        delete [] barkScale;
-    } else if (isNeedBarkScale && !isBarkScaleGenerated) {
+    if (isNeedBarkScale and not barkScale) {
 //        printf("[%lu] memory allocation for the bark scale\n", millis());
-        this->barkScale = new float[AMPLITUDES_SIZE];
+        barkScale = new float[AMPLITUDES_SIZE];
+    } else if (not isNeedBarkScale and barkScale) {
+//        printf("[%lu] freeing window memory bark scale\n", millis());
+        delete[] barkScale;
+        barkScale = nullptr;
     }
-    if (isNeedUpdateBarkScale && newCfg.amplitudesType == BARK) {
+
+    if (isNeedUpdateBarkScale and newCfg.amplitudesType == BARK) {
         generateBarkScale(newCfg.frequencyStep);
-    } else if (isNeedUpdateBarkScale && newCfg.amplitudesType == CUSTOM_BARK) {
+    } else if (isNeedUpdateBarkScale and newCfg.amplitudesType == CUSTOM_BARK) {
         generateCustomBarkScale(newCfg.frequencyStep);
     }
+
     cfg = newCfg;
 }
 
 void FFTColorMusic::addSamples(const uint8_t *data, uint32_t length) {
-    length = length/4;
-    auto frame = (Frame*)data;
+    length = length / 4;
+    auto frame = (StereoFrame16*)data;
 
-    if (length == SAMPLES_SIZE) samples.fullness = 0;
-
-    if (samples.fullness + length > SAMPLES_SIZE && length < SAMPLES_SIZE) {
-        uint16_t countOfOutOfBounds =  samples.fullness + length - SAMPLES_SIZE;
-        // Offset of the samples array by countOfOutOfBounds
-        for (uint16_t i = countOfOutOfBounds; i < SAMPLES_SIZE; i++) {
-            samples.left[i - countOfOutOfBounds] = samples.left[i];
-            samples.right[i - countOfOutOfBounds] = samples.right[i];
+    if (length < SAMPLES_SIZE) {
+        // offset with fill
+        // 0,1,2,3,4 to 3,4,100,101,102 where 100,101,102 - data
+        uint16_t countOfOutOfBounds = SAMPLES_SIZE - length;
+        for (uint16_t i = 0; i < countOfOutOfBounds; i++) {
+            samples.left[i] = samples.left[i + length];
+            samples.right[i] = samples.right[i + length];
         }
-        // The new full value of the samples array.
-        samples.fullness -= countOfOutOfBounds;
-    }
-
-    // Filling the array with new samples
-    if (SAMPLES_SIZE >= length) {
-        for (uint32_t i = 0; i < length; ++i) {
-            samples.left[samples.fullness] = frame[i].channel1;
-            samples.right[samples.fullness++] = frame[i].channel2;
+        for (int i = 0; i < length; ++i) {
+            samples.left[countOfOutOfBounds + i] = frame[i].channel1;
+            samples.right[countOfOutOfBounds + i] = frame[i].channel2;
+        }
+    } else if (length == SAMPLES_SIZE) {
+        // direct filling
+        for (int i = 0; i < SAMPLES_SIZE; ++i) {
+            samples.left[i] = frame[i].channel1;
+            samples.right[i] = frame[i].channel2;
         }
     } else {
-        for (samples.fullness = 0; samples.fullness < SAMPLES_SIZE; samples.fullness++) {
-            samples.left[SAMPLES_SIZE - 1 - samples.fullness] = frame[length - 1 - samples.fullness].channel1;
-            samples.right[SAMPLES_SIZE - 1 - samples.fullness] = frame[length - 1 - samples.fullness].channel2;
+        // filling from the end
+        // 0,1,2 to 102,103,104 where 100,101,102,103,104 - data
+        uint16_t countOfOutOfBounds = length - SAMPLES_SIZE;
+        for (int i = 0; i < SAMPLES_SIZE; ++i) {
+            samples.left[i] = frame[countOfOutOfBounds + i].channel1;
+            samples.right[i] = frame[countOfOutOfBounds + i].channel2;
         }
     }
 }
 
 void FFTColorMusic::calculateTarget(const int16_t *samplesIn, float *amplitudeOut) {
     // todo add mutex. maybe raise errors after change fft configs
-    for (int i = 0; i < SAMPLES_SIZE; i++) {
-        if (cfg.windowType != NO_WINDOW)
-            buffer[i * 2 + 0] = (float) samplesIn[i] * fftWindow[i];
-        else
+
+    if (cfg.windowType == NO_WINDOW) {
+        for (int i = 0; i < SAMPLES_SIZE; i++) {
             buffer[i * 2 + 0] = (float) samplesIn[i];
-        buffer[i * 2 + 1] = 0;
+            buffer[i * 2 + 1] = 0;
+        }
+    } else {
+        for (int i = 0; i < SAMPLES_SIZE; i++) {
+            buffer[i * 2 + 0] = (float) samplesIn[i] * fftWindow[i];
+            buffer[i * 2 + 1] = 0;
+        }
     }
 
     dsps_fft2r_fc32(buffer, SAMPLES_SIZE);
@@ -130,17 +120,13 @@ void FFTColorMusic::calculateTarget(const int16_t *samplesIn, float *amplitudeOu
         if (cfg.amplitudesType == LIN || cfg.amplitudesType == BARK)
             amplitudeOut[i] = 2 * sqrtf(temp)/SAMPLES_SIZE;
         switch(cfg.amplitudesType) {
-            case BARK:
-                amplitudeOut[i] *= barkScale[i];
-                break;
-            case LOG:
-                amplitudeOut[i] = 10 * log10f(temp/SAMPLES_SIZE);
-                break;
+            case BARK: amplitudeOut[i] *= barkScale[i]; break;
+            case LOG : amplitudeOut[i] = 10 * log10f(temp/SAMPLES_SIZE); break;
             default: break;
         }
 
-        if (amplitudeOut[i] > 32767) amplitudeOut[i] = 32767.0;
-        if (amplitudeOut[i] < 0 || isinf(amplitudeOut[i]) || isnan(amplitudeOut[i]))
+        if (amplitudeOut[i] > 32767.0) amplitudeOut[i] = 32767.0;
+        if (amplitudeOut[i] < 0.0 or std::isinf(amplitudeOut[i]) or std::isnan(amplitudeOut[i]))
             amplitudeOut[i] = 0.0;
     }
 }
@@ -154,7 +140,7 @@ void FFTColorMusic::generateBarkScale(float frequencyStep) {
 //    printf("[%lu] Bark scale generation\n", millis());
     float base;
     for (int i = 0; i < AMPLITUDES_SIZE; i++) {
-        base = (float) i * (frequencyStep/650);
+        base = (float) i * (frequencyStep / 650);
         barkScale[i] = 7 * logf(base + sqrtf(1 + base * base));
     }
 }
@@ -171,45 +157,12 @@ void FFTColorMusic::generateCustomBarkScale(float frequencyStep) {
 
 void FFTColorMusic::generateWindow(WindowType type) {
     switch (type) {
-        case NO_WINDOW:
-            break;
-        case BLACKMAN:
-            dsps_wind_blackman_f32(fftWindow, SAMPLES_SIZE);
-            break;
-        case BLACKMAN_HARRIS:
-            dsps_wind_blackman_harris_f32(fftWindow, SAMPLES_SIZE);
-            break;
-        case BLACKMAN_NUTTALL:
-            dsps_wind_blackman_nuttall_f32(fftWindow, SAMPLES_SIZE);
-            break;
-        case FLAT_TOP:
-            dsps_wind_flat_top_f32(fftWindow, SAMPLES_SIZE);
-            break;
-        case HANN:
-            dsps_wind_hann_f32(fftWindow, SAMPLES_SIZE);
-            break;
-        case NUTTALL:
-            dsps_wind_nuttall_f32(fftWindow, SAMPLES_SIZE);
-            break;
+        case BLACKMAN:          dsps_wind_blackman_f32(fftWindow, SAMPLES_SIZE);            break;
+        case BLACKMAN_HARRIS:   dsps_wind_blackman_harris_f32(fftWindow, SAMPLES_SIZE);     break;
+        case BLACKMAN_NUTTALL:  dsps_wind_blackman_nuttall_f32(fftWindow, SAMPLES_SIZE);    break;
+        case FLAT_TOP:          dsps_wind_flat_top_f32(fftWindow, SAMPLES_SIZE);            break;
+        case HANN:              dsps_wind_hann_f32(fftWindow, SAMPLES_SIZE);                break;
+        case NUTTALL:           dsps_wind_nuttall_f32(fftWindow, SAMPLES_SIZE);             break;
+        default: break;
     }
 }
-
-uint32_t FFTColorMusic::getMaxObjectSize() {
-    // MAX Size = sizeObject + fftTable(float*SAMPLES_SIZE) + window(float*SAMPLES_SIZE) + bark(float*AMPLITUDES_SIZE)
-    // todo add stack size task and another. +- 57.1k size when SAMPLES_SIZE = 2048
-    uint32_t sizeObject = sizeof(FFTColorMusic) + sizeof(float) * AMPLITUDES_SIZE * (1 + 2 + 2);
-    return sizeObject;
-}
-
-uint16_t FFTColorMusic::getDeltaMinMaxSample(const int16_t *samples) {
-    int16_t minValue = 0;
-    int16_t maxValue = 0;
-    for (int i = 0; i < SAMPLES_SIZE; i++) {
-        if (samples[i] > maxValue) maxValue = samples[i];
-        if (samples[i] < minValue) minValue = samples[i];
-    }
-    return maxValue + abs(minValue);
-}
-
-
-

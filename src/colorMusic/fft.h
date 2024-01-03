@@ -3,23 +3,22 @@
 
 
 #ifndef SAMPLES_SIZE
-    #define SAMPLES_SIZE 2048
+#define SAMPLES_SIZE 2048
 #endif
 
-#define AMPLITUDES_SIZE SAMPLES_SIZE / 2
+#define AMPLITUDES_SIZE (SAMPLES_SIZE / 2)
 
-#include "CustomBluetoothA2DPSink.h"
-#include "FastLED.h"
+#include "esp32-hal.h"
 #include "esp_dsp.h"
-#include "cmath"
+#include <cmath>
 #include "configs.h"
 
-enum AmplitudesType : uint8_t {
+enum AmplitudesType {
     LIN, LOG, BARK, CUSTOM_BARK
 };
 
 
-enum WindowType : uint8_t {
+enum WindowType {
     NO_WINDOW, BLACKMAN, BLACKMAN_HARRIS, BLACKMAN_NUTTALL, FLAT_TOP, HANN, NUTTALL
 };
 
@@ -27,7 +26,6 @@ enum WindowType : uint8_t {
 struct Samples {
     int16_t left[SAMPLES_SIZE]{};
     int16_t right[SAMPLES_SIZE]{};
-    uint16_t fullness = 0;
 };
 
 
@@ -44,6 +42,12 @@ struct FFTConfig {
 };
 
 
+struct __attribute__((packed)) StereoFrame16 {
+    int16_t channel1 = 0;
+    int16_t channel2 = 0;
+};
+
+
 class FFTColorMusic {
 public:
     explicit FFTColorMusic(FFTConfig &config);
@@ -52,10 +56,8 @@ public:
     void setConfigs(FFTConfig &config);
     void calculate();
 
-    uint16_t static getDeltaMinMaxSample(const int16_t *samples);
-    uint32_t static getMaxObjectSize();
-    Samples samples;
-    Amplitudes amplitudes;
+    Samples samples{};
+    Amplitudes amplitudes{};
 
 private:
     void calculateTarget(const int16_t *samplesIn, float *amplitudeOut);
@@ -63,10 +65,10 @@ private:
     void generateBarkScale(float frequencyStep);
     void generateCustomBarkScale(float frequencyStep);
 
-    float *barkScale;
-    float *fftWindow;
+    float *barkScale = nullptr;
+    float *fftWindow = nullptr;
     float buffer[SAMPLES_SIZE * 2] __attribute__((aligned(16))){};
-    float *fftTable;
+    float fftTable[SAMPLES_SIZE]{};
     FFTConfig cfg;
 };
 
