@@ -23,9 +23,9 @@ struct SamplesBuffer {
 
 class ColorMusic {
 public:
-    explicit ColorMusic(CustomLedStrip &targetStrip);
-    void enable();
+    ColorMusic();
     ~ColorMusic();
+    void enable();
     void disable();
     void setupCallbacks(CustomBluetoothA2DPSink *a2dp);
 
@@ -35,6 +35,7 @@ public:
     FFTConfig getConfigFFT();
     void setConfigFFT(FFTConfig &config);
 
+    void setStrip(CustomLedStrip *strip_ptr);
     void setSerialPortInteraction(SerialPortInteraction *serialPortInteractionPointer);
 
 private:
@@ -46,9 +47,12 @@ private:
     FFTColorMusic *fft = nullptr;
     TaskHandle_t handleColorMusic = nullptr;
     FFTConfig fftConfig;
-    CustomLedStrip &strip;
+    CustomLedStrip *strip = nullptr;
+    SerialPortInteraction *serialPortInteraction = nullptr;
     CustomBluetoothA2DPSink *a2dp = nullptr;
-    SerialPortInteraction *serialPortInteraction;
+    uint32_t lastTimeRed = millis();
+    uint32_t lastTimeGreen = millis();
+    uint32_t lastTimeBlue = millis();
 };
 
 #endif //ESP32_COLOR_MUSIC_COLORMUSIC_H

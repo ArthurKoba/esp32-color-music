@@ -26,7 +26,8 @@ void ColorModes::show() {
 
 void ColorModes::rainbowMode() {
     static uint8_t index = 0;
-    for (uint16_t i = 0; i < strip.length; i++) strip.leds[i] = static_cast<CRGB>(CHSV(index - i, 255, 255));
+    for (uint16_t i = 0; i < strip.lengthLeds; i++)
+        strip.leds[i] = static_cast<CRGB>(CHSV(index - i, 255, 255));
     index++;
     strip.show();
     delay(delays.rainbow);
