@@ -2,16 +2,22 @@
 
 LedStrip::LedStrip() {
     this->leds = nullptr;
-    this->length = 0;
+    this->lengthLeds = 0;
 }
 
 LedStrip::~LedStrip() {
-    if (handleShowTask != nullptr) vTaskDelete(handleShowTask);
+    if (handleShowTask) {
+        vTaskDelete(handleShowTask);
+        handleShowTask = nullptr;
+    }
+    delete []leds;
+//    leds = nullptr;
 }
 
-void LedStrip::start(CRGB *ledsPointer, uint16_t ledsLength) {
-    this->leds = ledsPointer;
-    this->length = ledsLength;
+void LedStrip::init(uint16_t ledsLength_) {
+    lengthLeds = ledsLength_;
+    leds = new CRGB[lengthLeds];
+    CFastLED::addLeds<WS2812B, WS2812B_PIN, GRB>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
     xTaskCreate(
             LedStrip::sendExecutor,
             "LedStripExecutor",
@@ -33,35 +39,38 @@ void LedStrip::sendExecutor(void *pvParam) {
             case SET_LEDS:
                 FastLED.show();
                 break;
+            default:
+                break;
         }
     }
 }
 
 void LedStrip::showColor(CRGB color) {
-    if (length == 0) return;
+    if (lengthLeds == 0) return;
     showColorValue = color;
     xTaskNotify(handleShowTask, SET_COLOR, eSetValueWithOverwrite);
 }
 
 void LedStrip::show() {
-    if (length == 0) return;
+    if (lengthLeds == 0) return;
     xTaskNotify(handleShowTask, SET_LEDS, eSetValueWithOverwrite);
 }
 
-void LedStrip::clear() {
-    for (uint16_t i = 0; i < length; ++i) leds[i] = CRGB::Black;
+void LedStrip::clear() const {
+    for (uint16_t i = 0; i < lengthLeds; ++i) leds[i] = CRGB::Black;
 }
 
-void LedStrip::setBrightness(uint8_t bright) {
+void LedStrip::setBrightness(uint8_t bright_) {
+    bright = bright_;
     FastLED.setBrightness(bright);
 }
 
-uint8_t LedStrip::getBrightness() {
-    return FastLED.getBrightness();
+uint8_t LedStrip::getBrightness() const {
+    return bright;
 }
 
 void LedStrip::changeBrightness(int16_t value) {
-    value += getBrightness();
-    uint8_t newValue = ((value)<(0)?(0):((value)>(255)?(255):(value)));
+    value += bright;
+    uint8_t newValue = value > 255 ? 255 : value < 0 ? 0 : value;
     setBrightness(newValue);
 }
