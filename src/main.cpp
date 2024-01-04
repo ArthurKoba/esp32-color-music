@@ -14,10 +14,10 @@ SystemManager manager;
 CustomLedStrip strip;
 Display display;
 ColorMusic colorMusic;
-ColorModes colorModes(strip, colorMusic);
-RemoteControl control;
+//ColorModes colorModes(strip, colorMusic);
+//RemoteControl control;
 CustomBluetoothA2DPSink a2dp_sink;
-SerialPortInteraction serialPortInteraction;
+//SerialPortInteraction serialPortInteraction;
 
 
 void setup() {
@@ -31,7 +31,8 @@ void setup() {
 //    colorMusic.setSerialPortInteraction(&serialPortInteraction);
     colorMusic.setupCallbacks(&a2dp_sink);
     colorMusic.setStrip(&strip);
-    colorModes.setMode(COLOR_MUSIC_MODE);
+    colorMusic.enable();
+//    colorModes.setMode(COLOR_MUSIC_MODE);
     a2dp_sink.set_pin_config(i2sPins);
     a2dp_sink.set_volume(64);
     a2dp_sink.start(BLUETOOTH_DEVICE_NAME);
@@ -43,9 +44,10 @@ void setup() {
 }
 
 void loop() {
-    control.handleCommands();
-    colorModes.show();
-    vTaskDelay(pdMS_TO_TICKS(10));
+    vTaskDelete(nullptr);
+//    control.handleCommands();
+//    colorModes.show();
+//    vTaskDelay(pdMS_TO_TICKS(10));
 }
 
 
