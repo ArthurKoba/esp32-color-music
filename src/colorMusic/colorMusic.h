@@ -38,8 +38,10 @@ public:
     void setStrip(CustomLedStrip *strip_ptr);
     void setSerialPortInteraction(SerialPortInteraction *serialPortInteractionPointer);
 
+    float amplitudes[AMPLITUDES_SIZE];
+
 private:
-    [[noreturn]] void static showTask(void *context);
+    [[noreturn]] void static showTask(void *pvParam);
     void show();
     ChannelBright calculateBrightFromChannel(const float *channel) const;
     QueueHandle_t samplesQueue = nullptr;

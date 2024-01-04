@@ -61,20 +61,26 @@ void ColorMusic::disable() {
 //    printf("free memory after delete: %i\n", ESP.getFreeHeap());
 }
 
-void ColorMusic::showTask(void *thisPointer) {
-    ColorMusic &self = *(ColorMusic*)thisPointer;
+void ColorMusic::showTask(void *pvParam) {
+    ColorMusic &t = *reinterpret_cast<ColorMusic *>(pvParam);
     SamplesBuffer buffer {};
     while (true) {
-        if (xQueuePeek(self.samplesQueue, &buffer, portMAX_DELAY) != pdTRUE) continue;
+        if (xQueuePeek(t.samplesQueue, &buffer, portMAX_DELAY) != pdTRUE) continue;
         uint32_t length = buffer.length >> 1;
-        self.fft->addSamples(buffer.data, length);
-        self.fft->calculate();
-        self.show();
-        self.fft->addSamples(buffer.data + length, length);
-        self.fft->calculate();
-        self.show();
-        xQueueReceive(self.samplesQueue, &buffer, 0); // Get first buffer from queue
-        delete [] buffer.data; // free memory buffer.data
+        t.fft->addSamples(buffer.data, length);
+        t.fft->calculate();
+        for (int i = 0; i < AMPLITUDES_SIZE >> 2; ++i) {
+            t.amplitudes[i] = t.fft->amplitudes.left[i];
+        }
+        t.show();
+        t.fft->addSamples(buffer.data + length, length);
+        t.fft->calculate();
+        for (int i = 0; i < AMPLITUDES_SIZE; ++i) {
+            t.amplitudes[i] = t.fft->amplitudes.left[i];
+        }
+        t.show();
+        xQueueReceive(t.samplesQueue, &buffer, 0); // Get first buffer from queue
+        delete[] buffer.data; // free memory buffer.data
     }
 }
 
