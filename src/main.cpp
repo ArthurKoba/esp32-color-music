@@ -7,7 +7,10 @@
 #include "colorMusic/colorMusic.h"
 #include "serialPortInteraction/serialPortInteraction.h"
 #include "audioReceiver.h"
+#include "control/SystemManager.h"
 
+
+SystemManager manager;
 CustomLedStrip strip;
 ColorMusic colorMusic;
 ColorModes colorModes(strip, colorMusic);
@@ -19,6 +22,7 @@ SerialPortInteraction serialPortInteraction;
 void setup() {
     Serial.begin(SERIAL_SPEED);
     printf("\n%s Starting...\n", BLUETOOTH_DEVICE_NAME);
+    manager.init();
     strip.init(NUM_LEDS);
     strip.setBrightness(100);
 //    colorMusic.setSerialPortInteraction(&serialPortInteraction);
