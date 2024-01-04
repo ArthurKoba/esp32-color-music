@@ -12,6 +12,7 @@
 
 SystemManager manager;
 CustomLedStrip strip;
+Display display;
 ColorMusic colorMusic;
 ColorModes colorModes(strip, colorMusic);
 RemoteControl control;
@@ -22,8 +23,10 @@ SerialPortInteraction serialPortInteraction;
 void setup() {
     Serial.begin(SERIAL_SPEED);
     printf("\n%s Starting...\n", BLUETOOTH_DEVICE_NAME);
-    manager.init();
     strip.init(NUM_LEDS);
+    manager.init();
+    display.initAndStart();
+    display.setSystemManager(&manager);
     strip.setBrightness(100);
 //    colorMusic.setSerialPortInteraction(&serialPortInteraction);
     colorMusic.setupCallbacks(&a2dp_sink);
