@@ -1,5 +1,12 @@
 #include "configs.h"
-#include "imports.h"
+
+#include "ledStrip/customLedStrip.h"
+#include "colorModes/colorModes.h"
+#include "control/remoteControl.h"
+#include "control/display.h"
+#include "colorMusic/colorMusic.h"
+#include "serialPortInteraction/serialPortInteraction.h"
+#include "audioReceiver.h"
 
 CustomLedStrip strip;
 ColorMusic colorMusic;
