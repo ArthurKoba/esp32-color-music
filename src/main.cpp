@@ -25,8 +25,9 @@ void setup() {
     printf("\n%s Starting...\n", BLUETOOTH_DEVICE_NAME);
     strip.init(NUM_LEDS);
     manager.init();
-    display.initAndStart();
-    display.setSystemManager(&manager);
+//    display.setAmplitudes(colorMusic.amplitudes, AMPLITUDES_SIZE);
+//    display.initAndStart();
+//    display.setSystemManager(&manager);
     strip.setBrightness(100);
 //    colorMusic.setSerialPortInteraction(&serialPortInteraction);
     colorMusic.setupCallbacks(&a2dp_sink);

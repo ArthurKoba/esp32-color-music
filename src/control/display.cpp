@@ -18,7 +18,7 @@ void Display::initAndStart() {
             this,
             DISPLAY_TASK_PRIORITY,
             &displayTaskHandle,
-            0
+            1
     );
 }
 
@@ -43,18 +43,15 @@ void Display::initUI() {
 
 void Display::update() {
     uint32_t timer = micros();
-    writeFPS();
     writeSystemStats();
+    writeAmplitudes();
     vTaskDelay(1);
     lastFPS = 1000000 / (micros() - timer);
 }
 
-void Display::writeFPS() {
+void Display::writeSystemStats() {
     tft->setCursor(statsOffset, 0);
     tft->println(lastFPS);
-}
-
-void Display::writeSystemStats() {
     if (not sysManager) return;
     tft->setCursor(0, 0);
     tft->println();
@@ -66,10 +63,28 @@ void Display::writeSystemStats() {
     tft->println(sysManager->getMemoryUsage());
 }
 
+void Display::writeAmplitudes() {
+    if (not amplitudes) return;
+    tft->startWrite();
+    uint8_t size;
+    for (int i = 0; i < 160; ++i) {
+        tft->setAddrWindow(80 + i, 50, 1, 128);
+        size = uint16_t(amplitudes[i]) >> 7;
+        if (size > 128) size = 128;
+        tft->writeColor(c.bg, 128 - size);
+        tft->writeColor(c.line, size);
+    }
+    tft->endWrite();
+}
+
 void Display::setSystemManager(SystemManager *manager_) {
     sysManager = manager_;
 }
 
+void Display::setAmplitudes(float *amplitudes_, size_t size) {
+    amplitudes = amplitudes_;
+    amplitudes_size = size;
+}
 
 
 

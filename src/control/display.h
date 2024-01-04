@@ -39,11 +39,12 @@ public:
 
     void initAndStart();
     void update();
+    void writeAmplitudes();
     void setSystemManager(SystemManager *);
+    void setAmplitudes(float *, size_t);
 
 private:
     void initUI();
-    void writeFPS();
     void writeSystemStats();
 
     [[noreturn]] static void displayTask(void *pvParam);
@@ -53,6 +54,8 @@ private:
     Adafruit_ILI9341 *tft;
     uint16_t lastFPS = 0;
     uint8_t statsOffset = 25;
+    float *amplitudes = nullptr;
+    size_t amplitudes_size = 0;
 
 
     struct {
