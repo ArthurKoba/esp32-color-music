@@ -1,18 +1,23 @@
+#ifndef ESP32_COLOR_MUSIC_AUDIORECEIVER_H
+#define ESP32_COLOR_MUSIC_AUDIORECEIVER_H
+
 #ifndef BLUETOOTH_DEVICE_NAME
-    #error BLUETOOTH_DEVICE_NAME required.
+#error BLUETOOTH_DEVICE_NAME required.
 #endif
 
 #ifndef I2S_BCK_PIN
-    #error I2S_BCK_PIN required.
+#error I2S_BCK_PIN required.
 #endif
 
 #ifndef I2S_DATA_OUT_PIN
-    #error I2S_DATA_OUT_PIN required.
+#error I2S_DATA_OUT_PIN required.
 #endif
 
 #ifndef I2S_WS_PIN
-    #error I2S_WS_PIN required.
+#error I2S_WS_PIN required.
 #endif
+
+#include <CustomBluetoothA2DPSink.h>
 
 i2s_pin_config_t i2sPins = {
         .bck_io_num = I2S_BCK_PIN,
@@ -24,3 +29,5 @@ i2s_pin_config_t i2sPins = {
 void change_volume(int newVolume) {
     Serial.println("New bt event volume: " + String(newVolume));
 }
+
+#endif //ESP32_COLOR_MUSIC_AUDIORECEIVER_H
