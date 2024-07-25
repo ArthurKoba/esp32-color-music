@@ -6,7 +6,6 @@
 #include "ledStrip/customLedStrip.h"
 #include "fft.h"
 #include "CustomBluetoothA2DPSink.h"
-#include "serialPortInteraction/serialPortInteraction.h"
 
 
 struct ChannelBright {
@@ -36,7 +35,6 @@ public:
     void setConfigFFT(FFTConfig &config);
 
     void setStrip(CustomLedStrip *strip_ptr);
-    void setSerialPortInteraction(SerialPortInteraction *serialPortInteractionPointer);
 
     float amplitudes[AMPLITUDES_SIZE];
 
@@ -49,7 +47,6 @@ private:
     TaskHandle_t handleColorMusic = nullptr;
     FFTConfig fftConfig;
     CustomLedStrip *strip = nullptr;
-    SerialPortInteraction *serialPortInteraction = nullptr;
     CustomBluetoothA2DPSink *a2dp = nullptr;
     uint32_t lastTimeRed = millis();
     uint32_t lastTimeGreen = millis();

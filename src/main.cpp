@@ -5,7 +5,6 @@
 #include "control/remoteControl.h"
 #include "control/display.h"
 #include "colorMusic/colorMusic.h"
-#include "serialPortInteraction/serialPortInteraction.h"
 #include "audioReceiver.h"
 #include "control/SystemManager.h"
 
@@ -17,7 +16,6 @@ ColorMusic colorMusic;
 //ColorModes colorModes(strip, colorMusic);
 //RemoteControl control;
 CustomBluetoothA2DPSink a2dp_sink;
-//SerialPortInteraction serialPortInteraction;
 
 
 void setup() {
@@ -29,7 +27,6 @@ void setup() {
 //    display.initAndStart();
 //    display.setSystemManager(&manager);
     strip.setBrightness(100);
-//    colorMusic.setSerialPortInteraction(&serialPortInteraction);
     colorMusic.setupCallbacks(&a2dp_sink);
     colorMusic.setStrip(&strip);
     colorMusic.enable();
@@ -38,10 +35,8 @@ void setup() {
     a2dp_sink.set_volume(64);
     a2dp_sink.start(BLUETOOTH_DEVICE_NAME);
 //    control.setup();
-//    control.setSerialPortInteraction(&serialPortInteraction);
 //    control.setLedStrip((LedStrip*)&strip);
 //    control.setColorModes(&colorModes);
-//    serialPortInteraction.start();
 }
 
 void loop() {

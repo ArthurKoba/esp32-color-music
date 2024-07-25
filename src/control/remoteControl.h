@@ -5,7 +5,6 @@
 #include "Arduino.h" // from import uint16_t and another types
 #include "colorModes/colorModes.h"
 #include "ledStrip/ledStrip.h"
-#include "serialPortInteraction/serialPortInteraction.h"
 
 
 #ifndef IR_RECEIVE_PIN

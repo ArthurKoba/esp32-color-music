@@ -5,7 +5,6 @@ RemoteControl::RemoteControl() {
     this->colorModes = nullptr;
     this->strip = nullptr;
     this->colorMusic = nullptr;
-    this->serialPortInteraction = nullptr;
 }
 
 void RemoteControl::setup() {
@@ -80,10 +79,10 @@ void RemoteControl::handleTestIRCommand(IRButton command) {
         case FADE_BUTTON:
             break;
         case YELLOW_BUTTON:
-            if (serialPortInteraction != nullptr) serialPortInteraction->stop();
+
             break;
         case NAVY_BUTTON:
-            if (serialPortInteraction != nullptr) serialPortInteraction->start();
+
             break;
         case PINK_BUTTON:
             break;
@@ -175,8 +174,3 @@ void RemoteControl::setLedStrip(LedStrip *stripPointer) {
 void RemoteControl::setColorMusic(ColorMusic *colorMusicPointer) {
     this->colorMusic = colorMusicPointer;
 }
-
-void RemoteControl::setSerialPortInteraction(SerialPortInteraction *serialPortInteractionPointer) {
-    this->serialPortInteraction = serialPortInteractionPointer;
-}
-

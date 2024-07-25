@@ -22,10 +22,6 @@ void ColorMusic::setupCallbacks(CustomBluetoothA2DPSink *a2dpPointer) {
 //    a2dp_sink.set_avrc_metadata_callback(callbackAVRCMetadata);
 }
 
-void ColorMusic::setSerialPortInteraction(SerialPortInteraction *serialPortInteractionPointer) {
-    this->serialPortInteraction = serialPortInteractionPointer;
-}
-
 void ColorMusic::setStrip(CustomLedStrip *strip_ptr) {
     strip = strip_ptr;
 }
