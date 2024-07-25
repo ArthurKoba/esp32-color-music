@@ -27,8 +27,6 @@ public:
     void setColorModes(ColorModes *colorModesPointer);
     void setLedStrip(LedStrip *stripPointer);
     void setColorMusic(ColorMusic *colorMusicPointer);
-    void setSerialPortInteraction(SerialPortInteraction *serialPortInteractionPointer);
-
     void handleCommands();
 private:
     void handleIR();
@@ -37,7 +35,6 @@ private:
     ColorMusic *colorMusic;
     ColorModes *colorModes;
     LedStrip *strip;
-    SerialPortInteraction *serialPortInteraction;
 };
 
 #endif //ESP32_COLOR_MUSIC_REMOTECONTROL_H
