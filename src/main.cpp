@@ -3,15 +3,11 @@
 #include "ledStrip/customLedStrip.h"
 #include "colorModes/colorModes.h"
 #include "control/remoteControl.h"
-#include "control/display.h"
 #include "colorMusic/colorMusic.h"
 #include "audioReceiver.h"
-#include "control/SystemManager.h"
 
 
-SystemManager manager;
 CustomLedStrip strip;
-Display display;
 ColorMusic colorMusic;
 //ColorModes colorModes(strip, colorMusic);
 //RemoteControl control;
@@ -20,13 +16,11 @@ CustomBluetoothA2DPSink a2dp_sink;
 
 void setup() {
     Serial.begin(SERIAL_SPEED);
-    printf("\n%s Starting...\n", BLUETOOTH_DEVICE_NAME);
+    printf("\n%s Starting ...\n", BLUETOOTH_DEVICE_NAME);
+
     strip.init(NUM_LEDS);
-    manager.init();
-//    display.setAmplitudes(colorMusic.amplitudes, AMPLITUDES_SIZE);
-//    display.initAndStart();
-//    display.setSystemManager(&manager);
     strip.setBrightness(100);
+
     colorMusic.setupCallbacks(&a2dp_sink);
     colorMusic.setStrip(&strip);
     colorMusic.enable();
