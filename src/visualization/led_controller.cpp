@@ -33,6 +33,10 @@ void LedController::add_segment(LedSegment segment) {
     segments.push_back(segment);
 }
 
+size_t LedController::number_of_segments() {
+    return segments.size();
+}
+
 const LedSegment *LedController::get_segment(size_t index) {
     if (index >= segments.size()) return nullptr;
     return &segments[index];
@@ -83,4 +87,8 @@ void LedController::show_task() {
             case SET_LEDS:  FastLED.show();                        break;
         }
     }
+}
+
+size_t LedController::number_of_leds() {
+    return NUM_LEDS;
 }

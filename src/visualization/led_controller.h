@@ -38,9 +38,11 @@ public:
     void change_brightness(float changeValue);
 
     void add_segment(LedSegment segment);
+    size_t number_of_segments();
     const LedSegment* get_segment(size_t index);
 
     void set_color_to_led(size_t index, CRGB color);
+    size_t number_of_leds();
     void fill_leds(CRGB color, size_t start_led = 0, size_t end_led = NUM_LEDS);
     void set_color_to_segment(uint8_t segment_id, CRGB color);
     void move_colors(size_t start_led, size_t end_led);
