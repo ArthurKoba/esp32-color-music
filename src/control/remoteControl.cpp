@@ -1,14 +1,12 @@
 #include "remoteControl.h"
-#include <IRRemote.hpp>
 
 RemoteControl::RemoteControl() {
     this->colorModes = nullptr;
-    this->strip = nullptr;
     this->colorMusic = nullptr;
 }
 
 void RemoteControl::setup() {
-    IrReceiver.begin(IR_RECEIVE_PIN);
+
 }
 
 void RemoteControl::handleCommands() {
@@ -23,10 +21,10 @@ void RemoteControl::handleTestIRCommand(IRButton command) {
 
     switch (command) {
         case BRIGHT_UP_BUTTON:
-            if (strip != nullptr) strip->changeBrightness(+5);
+//            if (strip != nullptr) strip->changeBrightness(+5);
             break;
         case BRIGHT_DOWN_BUTTON:
-            if (strip != nullptr) strip->changeBrightness(-5);
+//            if (strip != nullptr) strip->changeBrightness(-5);
             break;
         case OFF_BUTTON:
             if (colorModes != nullptr) colorModes->setMode(OFF_MODE);
@@ -98,10 +96,10 @@ void RemoteControl::handleIRCommand(IRButton command) {
     return;
     switch (command) {
         case BRIGHT_UP_BUTTON:
-            if (strip != nullptr) strip->changeBrightness(+5);
+//            if (strip != nullptr) strip->changeBrightness(+5);
             break;
         case BRIGHT_DOWN_BUTTON:
-            if (strip != nullptr) strip->changeBrightness(-5);
+//            if (strip != nullptr) strip->changeBrightness(-5);
             break;
         case OFF_BUTTON:
             if (colorModes != nullptr) colorModes->setMode(OFF_MODE);
@@ -154,21 +152,11 @@ void RemoteControl::handleIRCommand(IRButton command) {
 }
 
 void RemoteControl::handleIR() {
-    if (!IrReceiver.decode()) return;
-    if (IrReceiver.decodedIRData.command != 0 || IrReceiver.decodedIRData.decodedRawData == -16716032) {
-        if (IrReceiver.decodedIRData.command > 23) return;
 
-        handleIRCommand((IRButton)IrReceiver.decodedIRData.command);
-    }
-    IrReceiver.resume();
 }
 
 void RemoteControl::setColorModes(ColorModes *colorModesPointer) {
     this->colorModes = colorModesPointer;
-}
-
-void RemoteControl::setLedStrip(LedStrip *stripPointer) {
-    this->strip = stripPointer;
 }
 
 void RemoteControl::setColorMusic(ColorMusic *colorMusicPointer) {

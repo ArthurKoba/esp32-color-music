@@ -6,11 +6,12 @@ void App::setup() {
     Serial.begin(SERIAL_SPEED);
     printf("\n%s Starting ...\n", BLUETOOTH_DEVICE_NAME);
 
-    strip.init(NUM_LEDS);
-    strip.setBrightness(100);
+    led_controller.init();
+    led_controller.set_brightness(100);
+
 //
     colorMusic.setupCallbacks(&a2dp_sink);
-    colorMusic.setStrip(&strip);
+//    colorMusic.setStrip(&strip);
     colorMusic.enable();
 ////    colorModes.setMode(COLOR_MUSIC_MODE);
 
@@ -44,7 +45,11 @@ void App::setup() {
 
 void App::tick() {
 //    control.handleCommands();
-//    colorModes.show();
+    show_mode();
     encoder.tick();
 //    vTaskDelay(pdMS_TO_TICKS(10));
+}
+
+void App::show_mode() {
+
 }

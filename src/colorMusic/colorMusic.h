@@ -3,7 +3,7 @@
 
 #include <cstdio>
 #include "configs.h"
-#include "ledStrip/customLedStrip.h"
+//#include "ledStrip/customLedStrip.h"
 #include "fft.h"
 #include "CustomBluetoothA2DPSink.h"
 
@@ -34,7 +34,7 @@ public:
     FFTConfig getConfigFFT();
     void setConfigFFT(FFTConfig &config);
 
-    void setStrip(CustomLedStrip *strip_ptr);
+//    void setStrip(CustomLedStrip *strip_ptr);
 
     float amplitudes[AMPLITUDES_SIZE];
 
@@ -46,7 +46,6 @@ private:
     FFTColorMusic *fft = nullptr;
     TaskHandle_t handleColorMusic = nullptr;
     FFTConfig fftConfig;
-    CustomLedStrip *strip = nullptr;
     CustomBluetoothA2DPSink *a2dp = nullptr;
     uint32_t lastTimeRed = millis();
     uint32_t lastTimeGreen = millis();

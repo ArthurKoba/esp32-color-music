@@ -22,11 +22,6 @@ void ColorMusic::setupCallbacks(CustomBluetoothA2DPSink *a2dpPointer) {
 //    a2dp_sink.set_avrc_metadata_callback(callbackAVRCMetadata);
 }
 
-void ColorMusic::setStrip(CustomLedStrip *strip_ptr) {
-    strip = strip_ptr;
-}
-
-
 void ColorMusic::enable() {
     if (this->fft) return;
     printf("[%lu] ColorMusic enable.\n", millis());
@@ -83,7 +78,7 @@ void ColorMusic::showTask(void *pvParam) {
 void ColorMusic::setSampleRate(uint16_t sampleRate, void *thisPointer) {
     ColorMusic &object = *(ColorMusic*)thisPointer;
     printf("[%lu] new sample rate: %u \n", millis(), sampleRate);
-    object.fftConfig.frequencyStep = 1/((float) SAMPLES_SIZE/ (float) sampleRate);
+    object.fftConfig.frequencyStep = float(sampleRate) / float(SAMPLES_SIZE);
     if (object.fft != nullptr) object.setConfigFFT(object.fftConfig);
 }
 
@@ -105,7 +100,7 @@ void ColorMusic::setConfigFFT(FFTConfig &config) {
 }
 
 void ColorMusic::show() {
-    if (!fft || !strip) return;
+    if (!fft) return;
 
     ChannelBright leftChannelBright = calculateBrightFromChannel(fft->amplitudes.left);
     ChannelBright rightChannelBright = calculateBrightFromChannel(fft->amplitudes.right);
@@ -130,21 +125,21 @@ void ColorMusic::show() {
         this->lastTimeBlue = time;
     }
 
-    strip->flowDown(needUpdateRed, needUpdateGreen, needUpdateBlue);
-
-    strip->leds[114].setRGB(leftChannelBright.low, leftChannelBright.middle, leftChannelBright.high);
-    strip->leds[115].setRGB(rightChannelBright.low, rightChannelBright.middle, rightChannelBright.high);
-
-    BottomEQData data;
-    data.red_left=leftChannelBright.low;
-    data.green_left=leftChannelBright.middle;
-    data.blue_left=leftChannelBright.high;
-    data.red_right=rightChannelBright.low;
-    data.green_right=rightChannelBright.middle;
-    data.blue_right=rightChannelBright.high;
-    strip->setBottomEQ(data);
-
-    strip->show();
+//    strip->flowDown(needUpdateRed, needUpdateGreen, needUpdateBlue);
+//
+//    strip->leds[114].setRGB(leftChannelBright.low, leftChannelBright.middle, leftChannelBright.high);
+//    strip->leds[115].setRGB(rightChannelBright.low, rightChannelBright.middle, rightChannelBright.high);
+//
+//    BottomEQData data;
+//    data.red_left=leftChannelBright.low;
+//    data.green_left=leftChannelBright.middle;
+//    data.blue_left=leftChannelBright.high;
+//    data.red_right=rightChannelBright.low;
+//    data.green_right=rightChannelBright.middle;
+//    data.blue_right=rightChannelBright.high;
+//    strip->setBottomEQ(data);
+//
+//    strip->show();
 
 }
 
