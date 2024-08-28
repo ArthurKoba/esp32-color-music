@@ -10,10 +10,10 @@
 #include "visualization/led_controller.h"
 #include "visualization/color_modes_manager.h"
 
-#include "CustomBluetoothA2DPSink.h"
+//#include "CustomBluetoothA2DPSink.h"
 //#include "colorModes/colorModes.h"
 //#include "control/remoteControl.h"
-#include "colorMusic/colorMusic.h"
+//#include "colorMusic/colorMusic.h"
 
 
 
@@ -22,11 +22,12 @@ class App {
     LedController led_controller;
     ColorModesManager color_modes_manager;
 //    CustomLedStrip strip;
-    ColorMusic colorMusic;
+//    ColorMusic colorMusic;
 //    ColorModes colorModes(strip, colorMusic);
 //RemoteControl control;
-    CustomBluetoothA2DPSink a2dp_sink;
+//    CustomBluetoothA2DPSink a2dp_sink;
     Encoder encoder;
+    Button button;
 
 
 public:

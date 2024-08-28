@@ -24,11 +24,9 @@ void App::setup() {
 //    control.setLedStrip((LedStrip*)&strip);
 //    control.setColorModes(&colorModes);
 //    AsyncInput::encoder_config_t encoder_cfg;
-//
 //    encoder_cfg.clock_pin_cfg.pin = gpio_num_t(ENCODER_CLK_PIN);
 //    encoder_cfg.data_pin_cfg.pin = gpio_num_t(ENCODER_DT_PIN);
 //    encoder_cfg.max_events = 50;
-//
 //    encoder.set_handler([] (AsyncInput::encoder_event_t event, void *context) {
 //        auto &app = *reinterpret_cast<App*>(context);
 //        int new_volume = app.a2dp_sink.get_volume() + app.encoder.get_counter();
@@ -39,11 +37,23 @@ void App::setup() {
 //    }, this);
 //
 //    encoder.enable(encoder_cfg);
+
+    AsyncInput::button_config_t button_cfg;
+    button_cfg.pin_cfg.pin = gpio_num_t(ENCODER_BTN_PIN);
+    button_cfg.max_events = 10;
+
+    button.set_handler([] (AsyncInput::button_event_t event, void *context) {
+        auto &app = *reinterpret_cast<App*>(context);
+        if (event == AsyncInput::CLICK) app.color_modes_manager.next_mode();
+    }, this);
+
+    button.enable(button_cfg);
+
 }
 
 void App::tick() {
-//    control.handleCommands();
     color_modes_manager.show_mode(led_controller);
 //    encoder.tick();
+    button.tick();
 //    vTaskDelay(pdMS_TO_TICKS(10));
 }
