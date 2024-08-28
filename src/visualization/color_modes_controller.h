@@ -3,16 +3,20 @@
 
 #include "color_modes/abs_color_mode.h"
 #include "led_controller.h"
+#include "../audio_analysis/audio_analyzer.h"
 
-enum ColorMode {OFF_MODE, RAINBOW_MODE, TABLE_LIGHTING_MODE, NUMBER_OF_COLOR_MODES};
+enum ColorMode {OFF_MODE, COLOR_MUSIC_MODE, RAINBOW_MODE, TABLE_LIGHTING_MODE, NUMBER_OF_COLOR_MODES};
 
 class ColorModesController final {
     AbstractColorMode* _color_mode_p{};
     ColorMode _mode = OFF_MODE;
+    AudioAnalyzer *_analyzer = nullptr;
 public:
     void show_mode(LedController &led_controller);
     void set_mode(ColorMode mode);
     void next_mode();
+
+    void set_analyzer(AudioAnalyzer *analyzer);
 };
 
 #endif //ESP32_COLOR_MUSIC_COLOR_MODES_CONTROLLER_H

@@ -4,32 +4,21 @@
 #include "configs.h"
 
 #include <Arduino.h>
-
 #include <AsyncInput.h>
 
+#include "audio_analysis/audio_analyzer.h"
 #include "visualization/led_controller.h"
 #include "visualization/color_modes_controller.h"
 
 //#include "CustomBluetoothA2DPSink.h"
-//#include "colorModes/colorModes.h"
-//#include "control/remoteControl.h"
-//#include "colorMusic/colorMusic.h"
-
-
 
 class App {
-
     LedController led_controller;
     ColorModesController color_modes_manager;
-//    CustomLedStrip strip;
-//    ColorMusic colorMusic;
-//    ColorModes colorModes(strip, colorMusic);
-//RemoteControl control;
+    AudioAnalyzer analyzer;
 //    CustomBluetoothA2DPSink a2dp_sink;
     Encoder encoder;
     Button button;
-
-
 public:
     void setup();
     void tick();
