@@ -8,7 +8,7 @@
 #include <AsyncInput.h>
 
 #include "visualization/led_controller.h"
-#include "visualization/color_modes_manager.h"
+#include "visualization/color_modes_controller.h"
 
 //#include "CustomBluetoothA2DPSink.h"
 //#include "colorModes/colorModes.h"
@@ -20,7 +20,7 @@
 class App {
 
     LedController led_controller;
-    ColorModesManager color_modes_manager;
+    ColorModesController color_modes_manager;
 //    CustomLedStrip strip;
 //    ColorMusic colorMusic;
 //    ColorModes colorModes(strip, colorMusic);

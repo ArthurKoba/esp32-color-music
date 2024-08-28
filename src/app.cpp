@@ -6,7 +6,11 @@ void App::setup() {
 
     led_controller.init();
     led_controller.set_brightness(100);
-    color_modes_manager.set_mode(RAINBOW_MODE);
+    led_controller.add_segment({.start = 0, .end = 24});
+    led_controller.add_segment({.start = 205, .end = 229});
+
+
+    color_modes_manager.set_mode(TABLE_LIGHTING_MODE);
 //
 //    colorMusic.setupCallbacks(&a2dp_sink);
 ////    colorMusic.setStrip(&strip);

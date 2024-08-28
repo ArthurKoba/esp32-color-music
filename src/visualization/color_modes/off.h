@@ -6,10 +6,7 @@
 #define OFF_MODE_DEF_DELAY_MS 256
 #endif
 
-
-#include <cstdint>
 #include "abs_color_mode.h"
-
 
 class OffMode final: public AbstractColorMode {
     uint16_t _get_show_delay() const override;
