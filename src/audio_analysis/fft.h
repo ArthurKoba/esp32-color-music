@@ -1,6 +1,7 @@
 #ifndef ESP32_COLOR_MUSIC_FFT_H
 #define ESP32_COLOR_MUSIC_FFT_H
 
+#include "configs.h"
 
 #ifndef SAMPLES_SIZE
 #define SAMPLES_SIZE 2048
@@ -10,12 +11,8 @@
 
 #include "esp32-hal.h"
 #include "esp_dsp.h"
-#include <cmath>
-#include "configs.h"
 
-enum AmplitudesType {
-    LIN, LOG, BARK, CUSTOM_BARK
-};
+enum AmplitudesType {LIN, LOG, BARK, CUSTOM_BARK};
 
 
 enum WindowType {
@@ -36,9 +33,9 @@ struct Amplitudes {
 
 
 struct FFTConfig {
-    AmplitudesType amplitudesType = LIN;
-    WindowType windowType = NO_WINDOW;
-    float frequencyStep = 0.0;
+    AmplitudesType amplitudes_type = LIN;
+    WindowType window_type = NO_WINDOW;
+    float frequency_step = 0.0;
 };
 
 
@@ -48,28 +45,27 @@ struct __attribute__((packed)) StereoFrame16 {
 };
 
 
-class FFTColorMusic {
-public:
-    explicit FFTColorMusic(FFTConfig &config);
-    ~FFTColorMusic();
-    void addSamples(const uint8_t *data, uint32_t length);
-    void setConfigs(FFTConfig &config);
-    void calculate();
+class FFTCore {
+    float *_bark_scale = nullptr;
+    float *_fft_window = nullptr;
+    float _buffer[SAMPLES_SIZE * 2] __attribute__((aligned(16))){};
+    float _fft_table[SAMPLES_SIZE]{};
+    FFTConfig _cfg;
 
+public:
     Samples samples{};
     Amplitudes amplitudes{};
 
+    explicit FFTCore(FFTConfig &config);
+    ~FFTCore();
+    void add_samples(const uint8_t *data, uint32_t length);
+    void set_configs(FFTConfig &config);
+    void calculate();
 private:
-    void calculateTarget(const int16_t *samplesIn, float *amplitudeOut);
-    void generateWindow(WindowType type);
-    void generateBarkScale(float frequencyStep);
-    void generateCustomBarkScale(float frequencyStep);
-
-    float *barkScale = nullptr;
-    float *fftWindow = nullptr;
-    float buffer[SAMPLES_SIZE * 2] __attribute__((aligned(16))){};
-    float fftTable[SAMPLES_SIZE]{};
-    FFTConfig cfg;
+    void _calculate_target(const int16_t *samples_in, float *amplitude_out);
+    void _generate_window(WindowType type);
+    void _generate_bark_scale(float frequency_step);
+    void _generate_custom_bark_scale(float frequency_step);
 };
 
 #endif //ESP32_COLOR_MUSIC_FFT_H
