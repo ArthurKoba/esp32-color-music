@@ -11,18 +11,12 @@ void App::setup() {
     color_modes_manager.set_analyzer(&analyzer);
     color_modes_manager.set_mode(COLOR_MUSIC_MODE);
 
-//    colorMusic.setupCallbacks(&a2dp_sink);
-////    colorMusic.setStrip(&strip);
-//    colorMusic.enable();
-//////    colorModes.setMode(COLOR_MUSIC_MODE);
-//
-//    a2dp_sink.set_pin_config({
-//        .bck_io_num = gpio_num_t(I2S_BCK_PIN),
-//        .ws_io_num = gpio_num_t(I2S_WS_PIN),
-//        .data_out_num = gpio_num_t(I2S_DATA_OUT_PIN)
-//    });
-//    a2dp_sink.set_volume(64);
-//    a2dp_sink.start(BLUETOOTH_DEVICE_NAME);
+    COBS::config_t cobs_config = {.delimiter = '\n', .depth = 255};
+    transmitter.set_config(cobs_config, [] (uint8_t *data_p, size_t size, void *context) {
+        Serial.write(data_p, size);
+        Serial.flush();
+    }, nullptr);
+
     analyzer.setup_callbacks(&a2dp_sink, &transmitter);
 
     a2dp_sink.set_pin_config({

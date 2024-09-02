@@ -17,6 +17,7 @@ class App {
     ColorModesController color_modes_manager;
     AudioAnalyzer analyzer;
     CustomBluetoothA2DPSink a2dp_sink;
+    BDSPTransmitter transmitter;
     Encoder encoder;
     Button button;
 public:

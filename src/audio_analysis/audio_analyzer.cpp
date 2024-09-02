@@ -39,6 +39,11 @@ void AudioAnalyzer::_analyzer_task() {
 //        _fft->add_samples(buffer.data, length);
 //        printf("in analyzer task\n");
         _fft->add_samples(buffer.data, buffer.length);
+        Packet packet(1, 256, nullptr);
+        packet.create_buffer();
+        auto samples = reinterpret_cast<uint8_t*>(_fft->samples.left);
+        for (int i = 0; i < 256; i+=2) packet.data_ptr[i] = samples[i];
+        _bdsp_transmitter->send_packet(packet);
         _fft->calculate();
         _calculate_audio_information();
 //        _fft->add_samples(buffer.data + length, length);
@@ -88,6 +93,7 @@ AudioInformation AudioAnalyzer::_calculate_audio_information_for_channel(float *
 
 void AudioAnalyzer::setup_callbacks(CustomBluetoothA2DPSink *a2dp, BDSPTransmitter *bdsp_transmitter_) {
     _a2dp = a2dp;
+    _bdsp_transmitter = bdsp_transmitter_;
     a2dp->set_raw_stream_reader([] (const uint8_t *data, uint32_t length, void *context) {
         static_cast<AudioAnalyzer*>(context)->add_samples(data, length);
     }, this);
