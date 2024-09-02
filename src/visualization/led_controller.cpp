@@ -1,15 +1,17 @@
 #include "led_controller.h"
 #include "FastLED.h"
 
+LedController::LedController() {
+    CFastLED::addLeds<WS2812B, WS2812B_PIN, GRB>(leds, NUM_LEDS);
+    FastLED.setCorrection(TypicalLEDStrip);
+}
+
 LedController::~LedController() {
     if (handle_show_task) vTaskDelete(handle_show_task);
 }
 
-void LedController::init() {
-
-    CFastLED::addLeds<WS2812B, WS2812B_PIN, GRB>(leds, NUM_LEDS);
-    FastLED.setCorrection(TypicalLEDStrip);
-
+void LedController::start() {
+    if (handle_show_task) return;
     xTaskCreate(
             [] (void *context) {static_cast<LedController*>(context)->show_task();},
             "LedController_show_task",
@@ -91,4 +93,8 @@ void LedController::show_task() {
 
 size_t LedController::number_of_leds() {
     return NUM_LEDS;
+}
+
+uint8_t LedController::crt(uint8_t value) {
+    return value > 0 ? (1 + static_cast<uint16_t>(value * value + 255)) >> 8 : 0;
 }

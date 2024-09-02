@@ -27,9 +27,10 @@ class LedController final {
     enum NotificationShowType {SET_COLOR, SET_LEDS};
 
 public:
+    LedController();
     ~LedController();
 
-    void init();
+    void start();
     void show_color(CRGB color);
     void show();
 
@@ -46,6 +47,8 @@ public:
     void fill_leds(CRGB color, size_t start_led = 0, size_t end_led = NUM_LEDS);
     void set_color_to_segment(uint8_t segment_id, CRGB color);
     void move_colors(size_t start_led, size_t end_led);
+
+    static uint8_t crt(uint8_t value);
 };
 
 
