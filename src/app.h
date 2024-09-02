@@ -5,18 +5,18 @@
 
 #include <Arduino.h>
 #include <AsyncInput.h>
+#include <BDSP.h>
 
 #include "audio_analysis/audio_analyzer.h"
 #include "visualization/led_controller.h"
 #include "visualization/color_modes_controller.h"
-
-//#include "CustomBluetoothA2DPSink.h"
+#include "CustomBluetoothA2DPSink.h"
 
 class App {
     LedController led_controller;
     ColorModesController color_modes_manager;
     AudioAnalyzer analyzer;
-//    CustomBluetoothA2DPSink a2dp_sink;
+    CustomBluetoothA2DPSink a2dp_sink;
     Encoder encoder;
     Button button;
 public:
