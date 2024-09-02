@@ -4,11 +4,12 @@
 #include "color_modes/table_lighting.h"
 #include "color_music_mode.h"
 
-void ColorModesController::show_mode(LedController &led_controller) {
+void ColorModesController::show_mode() {
+    if (not _led_controller) return;
     if (not _color_mode_p) set_mode(_mode);
-    if (not _color_mode_p->calculate(led_controller)) return;
-    if (_mode == OFF_MODE) led_controller.show_color(CRGB::Black);
-    else led_controller.show();
+    if (not _color_mode_p->calculate(*_led_controller)) return;
+    if (_mode == OFF_MODE) _led_controller->show_color(CRGB::Black);
+    else _led_controller->show();
 }
 
 void ColorModesController::set_mode(ColorMode mode) {
@@ -30,6 +31,7 @@ void ColorModesController::set_mode(ColorMode mode) {
         case NUMBER_OF_COLOR_MODES:
             break;
     }
+    if (_led_controller) _led_controller->fill_leds(CRGB::Black);
 }
 
 void ColorModesController::next_mode() {
@@ -38,4 +40,8 @@ void ColorModesController::next_mode() {
 
 void ColorModesController::set_analyzer(AudioAnalyzer *analyzer) {
     _analyzer = analyzer;
+}
+
+void ColorModesController::set_led_controller(LedController *led_controller) {
+    _led_controller = led_controller;
 }

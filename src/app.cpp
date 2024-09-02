@@ -9,6 +9,7 @@ void App::setup() {
     led_controller.add_segment({.start = 205, .end = 229});
 
     color_modes_manager.set_analyzer(&analyzer);
+    color_modes_manager.set_led_controller(&led_controller);
     color_modes_manager.set_mode(COLOR_MUSIC_MODE);
 
     COBS::config_t cobs_config = {.delimiter = '\n', .depth = 255};
@@ -54,7 +55,7 @@ void App::setup() {
 }
 
 void App::tick() {
-    color_modes_manager.show_mode(led_controller);
+    color_modes_manager.show_mode();
     encoder.tick();
     button.tick();
 }

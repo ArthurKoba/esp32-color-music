@@ -11,12 +11,14 @@ class ColorModesController final {
     AbstractColorMode* _color_mode_p{};
     ColorMode _mode = OFF_MODE;
     AudioAnalyzer *_analyzer = nullptr;
+    LedController *_led_controller = nullptr;
 public:
-    void show_mode(LedController &led_controller);
+    void show_mode();
     void set_mode(ColorMode mode);
     void next_mode();
 
     void set_analyzer(AudioAnalyzer *analyzer);
+    void set_led_controller(LedController *led_controller);
 };
 
 #endif //ESP32_COLOR_MUSIC_COLOR_MODES_CONTROLLER_H
