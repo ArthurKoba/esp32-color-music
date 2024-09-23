@@ -2,7 +2,7 @@
 #define ESP32_COLOR_MUSIC_COLOR_MUSIC_MODE_H
 
 #if not defined(COLOR_MUSIC_MODE_DEF_DELAY_MS)
-#define COLOR_MUSIC_MODE_DEF_DELAY_MS 30
+#define COLOR_MUSIC_MODE_DEF_DELAY_MS 10
 #endif
 
 #include "color_modes/abs_color_mode.h"

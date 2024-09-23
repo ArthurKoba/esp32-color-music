@@ -8,6 +8,13 @@ void App::setup() {
     led_controller.add_segment({.start = 0, .end = 24});
     led_controller.add_segment({.start = 205, .end = 229});
 
+    led_controller.add_segment({.start = 0, .end = 7});
+    led_controller.add_segment({.start = 8, .end = 15});
+    led_controller.add_segment({.start = 16, .end = 23});
+    led_controller.add_segment({.start = 222, .end = 229});
+    led_controller.add_segment({.start = 214, .end = 221});
+    led_controller.add_segment({.start = 206, .end = 213});
+
     color_modes_manager.set_analyzer(&analyzer);
     color_modes_manager.set_led_controller(&led_controller);
 
