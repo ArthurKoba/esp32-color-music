@@ -58,7 +58,8 @@ public:
 
     explicit FFTCore(FFTConfig &config);
     ~FFTCore();
-    void add_samples(const uint8_t *data, uint32_t length);
+    void add_samples(const uint8_t *data, size_t length);
+    void add_samples(const StereoFrame16 *frames, size_t length);
     void set_configs(FFTConfig &config);
     void calculate();
 private:

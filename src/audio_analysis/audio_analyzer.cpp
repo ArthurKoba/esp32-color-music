@@ -35,20 +35,19 @@ void AudioAnalyzer::_analyzer_task() {
     SamplesBuffer buffer {};
     while (true) {
         if (xQueuePeek(_samples_queue, &buffer, portMAX_DELAY) != pdTRUE) continue;
-//        uint32_t length = buffer.length >> 1;
-//        _fft->add_samples(buffer.data, length);
-//        printf("in analyzer task\n");
-        _fft->add_samples(buffer.data, buffer.length);
-        Packet packet(1, 256, nullptr);
-        packet.create_buffer();
-        auto samples = reinterpret_cast<uint8_t*>(_fft->samples.left);
-        for (int i = 0; i < 256; i+=2) packet.data_ptr[i] = samples[i];
-        _bdsp_transmitter->send_packet(packet);
+        uint32_t length = buffer.length >> 1;
+        _fft->add_samples(buffer.data, length);
         _fft->calculate();
         _calculate_audio_information();
-//        _fft->add_samples(buffer.data + length, length);
-//        _fft->calculate();
-//        _calculate_audio_information();
+//        Packet packet(1, 256, nullptr);
+//        packet.create_buffer();
+//        auto samples = reinterpret_cast<uint8_t*>(_fft->samples.left);
+//        for (int i = 0; i < 256; i+=2) packet.data_ptr[i] = samples[i];
+//        _bdsp_transmitter->send_packet(packet);
+
+        _fft->add_samples(buffer.data + length, length);
+        _fft->calculate();
+        _calculate_audio_information();
         xQueueReceive(_samples_queue, &buffer, 0); // Get first buffer from queue
         delete[] buffer.data; // free memory buffer.data
     }
@@ -102,6 +101,4 @@ void AudioAnalyzer::setup_callbacks(CustomBluetoothA2DPSink *a2dp, BDSPTransmitt
         self._fft_config.frequency_step = float(sampleRate) / float(SAMPLES_SIZE);
         if (self._fft not_eq nullptr) self._fft->set_configs(self._fft_config);
     }, this);
-
 }
-

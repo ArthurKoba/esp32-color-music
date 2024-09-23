@@ -10,7 +10,6 @@ void App::setup() {
 
     color_modes_manager.set_analyzer(&analyzer);
     color_modes_manager.set_led_controller(&led_controller);
-    color_modes_manager.set_mode(COLOR_MUSIC_MODE);
 
     COBS::config_t cobs_config = {.delimiter = '\n', .depth = 255};
     transmitter.set_config(cobs_config, [] (uint8_t *data_p, size_t size, void *context) {
@@ -52,6 +51,8 @@ void App::setup() {
     encoder.enable(encoder_cfg);
     button.enable(button_cfg);
     a2dp_sink.start(BLUETOOTH_DEVICE_NAME);
+
+    color_modes_manager.set_mode(COLOR_MUSIC_MODE);
 }
 
 void App::tick() {

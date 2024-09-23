@@ -27,11 +27,9 @@ FFTCore::~FFTCore() {
 void FFTCore::set_configs(FFTConfig &config) {
     // todo need testing
     bool is_need_window = config.window_type != NO_WINDOW;
-    bool is_window_generated = _cfg.window_type != NO_WINDOW;
 
     if (is_need_window and not _fft_window) _fft_window = new float[SAMPLES_SIZE];
     else if (not is_need_window and _fft_window) {
-        printf("[%lu] freeing window memory\n", millis());
         delete[] _fft_window;
         _fft_window = nullptr;
     }
@@ -41,11 +39,8 @@ void FFTCore::set_configs(FFTConfig &config) {
     bool is_need_update_bark_scale = (_cfg.amplitudes_type != config.amplitudes_type or config.frequency_step != _cfg.frequency_step);
 
     if (is_need_bark_scale and not _bark_scale) {
-//        printf("[%lu] memory allocation for the bark scale\n", millis());
         _bark_scale = new float[AMPLITUDES_SIZE];
-
     } else if (not is_need_bark_scale and _bark_scale) {
-//        printf("[%lu] freeing window memory bark scale\n", millis());
         delete[] _bark_scale;
         _bark_scale = nullptr;
     }
@@ -59,10 +54,13 @@ void FFTCore::set_configs(FFTConfig &config) {
     _cfg = config;
 }
 
-void FFTCore::add_samples(const uint8_t *data, uint32_t length) {
+void FFTCore::add_samples(const uint8_t *data, size_t length) {
     length = length / 4;
-    //todo use cast
-    auto frame = (StereoFrame16*)data;
+    const StereoFrame16 *frames = reinterpret_cast<StereoFrame16*>(const_cast<uint8_t*>(data));
+    add_samples(frames, length);
+}
+
+void FFTCore::add_samples(const StereoFrame16 *frames, size_t length) {
     if (length < SAMPLES_SIZE) {
         // offset with fill
         // 0,1,2,3,4 to 3,4,100,101,102 where 100,101,102 - data
@@ -72,22 +70,22 @@ void FFTCore::add_samples(const uint8_t *data, uint32_t length) {
             samples.right[i] = samples.right[i + length];
         }
         for (int i = 0; i < length; ++i) {
-            samples.left[count_of_out_of_bounds + i] = frame[i].channel1;
-            samples.right[count_of_out_of_bounds + i] = frame[i].channel2;
+            samples.left[count_of_out_of_bounds + i] = frames[i].channel1;
+            samples.right[count_of_out_of_bounds + i] = frames[i].channel2;
         }
     } else if (length == SAMPLES_SIZE) {
         // direct filling
         for (int i = 0; i < SAMPLES_SIZE; ++i) {
-            samples.left[i] = frame[i].channel1;
-            samples.right[i] = frame[i].channel2;
+            samples.left[i] = frames[i].channel1;
+            samples.right[i] = frames[i].channel2;
         }
     } else {
         // filling from the end
         // 0,1,2 to 102,103,104 where 100,101,102,103,104 - data
         uint16_t count_of_out_of_bounds = length - SAMPLES_SIZE;
         for (int i = 0; i < SAMPLES_SIZE; ++i) {
-            samples.left[i] = frame[count_of_out_of_bounds + i].channel1;
-            samples.right[i] = frame[count_of_out_of_bounds + i].channel2;
+            samples.left[i] = frames[count_of_out_of_bounds + i].channel1;
+            samples.right[i] = frames[count_of_out_of_bounds + i].channel2;
         }
     }
 }
@@ -130,17 +128,15 @@ void FFTCore::calculate() {
     _calculate_target(samples.right, amplitudes.right);
 }
 
-void FFTCore::_generate_bark_scale(float frequencyStep) {
-//    printf("[%lu] Bark scale generation\n", millis());
+void FFTCore::_generate_bark_scale(float frequency_step) {
     float base;
     for (int i = 0; i < AMPLITUDES_SIZE; i++) {
-        base = (float) i * (_cfg.frequency_step / 650);
+        base = static_cast<float>(i) * (frequency_step / 650);
         _bark_scale[i] = 7 * logf(base + sqrtf(1 + base * base));
     }
 }
 
 void FFTCore::_generate_custom_bark_scale(float frequency_step) {
-//    printf("[%lu] Custom Bark scale generation\n", millis());
     float base;
     for (int i = 0; i < AMPLITUDES_SIZE; i++) {
         base = static_cast<float>(i) * (frequency_step / 3000);
