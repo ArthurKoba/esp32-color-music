@@ -1,7 +1,3 @@
-//
-// Created by Koba on 29.08.2024.
-//
-
 #include "rainbow.h"
 
 uint16_t RainbowMode::_get_show_delay() const {

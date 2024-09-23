@@ -4,7 +4,6 @@
 #include "configs.h"
 
 #include <vector>
-//#include "platforms/esp/32/fastled_esp32.h"
 #include "stdint.h"
 #include "RTOS.h"
 #include "FastLED.h"

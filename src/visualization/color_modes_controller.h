@@ -3,9 +3,12 @@
 
 #include "color_modes/abs_color_mode.h"
 #include "led_controller.h"
-#include "../audio_analysis/audio_analyzer.h"
+#include "audio_analysis/audio_analyzer.h"
+#include "visualization/color_modes/color_music/waterfall.h"
+#include "visualization/color_modes/color_music/waterfall_eq.h"
 
-enum ColorMode {OFF_MODE, COLOR_MUSIC_MODE, RAINBOW_MODE, TABLE_LIGHTING_MODE, NUMBER_OF_COLOR_MODES};
+
+enum ColorMode {OFF_MODE, CM_WATERFALL_MODE, CM_WATERFALL_EQ_MODE, RAINBOW_MODE, TABLE_LIGHTING_MODE, NUMBER_OF_COLOR_MODES};
 
 class ColorModesController final {
     AbstractColorMode* _color_mode_p{};

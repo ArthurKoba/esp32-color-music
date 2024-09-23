@@ -59,7 +59,7 @@ void App::setup() {
     button.enable(button_cfg);
     a2dp_sink.start(BLUETOOTH_DEVICE_NAME);
 
-    color_modes_manager.set_mode(COLOR_MUSIC_MODE);
+    color_modes_manager.set_mode(CM_WATERFALL_MODE);
 }
 
 void App::tick() {

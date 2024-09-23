@@ -2,7 +2,7 @@
 #define ESP32_COLOR_MUSIC_ABS_COLOR_MODE_H
 
 #include <cstdint>
-#include "../led_controller.h"
+#include "visualization/led_controller.h"
 
 
 class AbstractColorMode {

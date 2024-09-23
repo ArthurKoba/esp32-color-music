@@ -2,7 +2,8 @@
 #include "color_modes/rainbow.h"
 #include "color_modes/off.h"
 #include "color_modes/table_lighting.h"
-#include "color_music_mode.h"
+#include "color_modes/color_music/waterfall.h"
+#include "color_modes/color_music/waterfall_eq.h"
 
 void ColorModesController::show_mode() {
     if (not _led_controller) return;
@@ -13,12 +14,21 @@ void ColorModesController::show_mode() {
 }
 
 void ColorModesController::set_mode(ColorMode mode) {
+    if (_led_controller) _led_controller->fill_leds(CRGB::Black);
+
     _mode = mode >= NUMBER_OF_COLOR_MODES ? OFF_MODE : mode;
     delete _color_mode_p;
+
+    if (not _analyzer and (_mode == CM_WATERFALL_MODE or _mode == CM_WATERFALL_EQ_MODE)) {
+        _color_mode_p = new OffMode();
+        return;
+    }
     switch (_mode) {
-        case COLOR_MUSIC_MODE:
-            if (_analyzer) _color_mode_p = new ColorMusicMode(*_analyzer);
-            else _color_mode_p = new OffMode();
+        case CM_WATERFALL_MODE:
+            _color_mode_p = new WaterfallColorMusic(*_analyzer);
+            break;
+        case CM_WATERFALL_EQ_MODE:
+            _color_mode_p = new WaterfallEQColorMusic(*_analyzer);
             break;
         case RAINBOW_MODE:
             _color_mode_p = new RainbowMode();
@@ -31,7 +41,6 @@ void ColorModesController::set_mode(ColorMode mode) {
         case NUMBER_OF_COLOR_MODES:
             break;
     }
-    if (_led_controller) _led_controller->fill_leds(CRGB::Black);
 }
 
 void ColorModesController::next_mode() {
