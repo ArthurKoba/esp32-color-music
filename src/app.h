@@ -16,6 +16,7 @@ class App {
     LedController led_controller;
     ColorModesController color_modes_manager;
     AudioAnalyzer analyzer;
+    I2SStream i2s;
     CustomBluetoothA2DPSink a2dp_sink;
 //    BDSPTransmitter transmitter;
     Encoder encoder;

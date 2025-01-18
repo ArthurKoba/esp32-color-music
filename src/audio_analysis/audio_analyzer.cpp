@@ -6,12 +6,12 @@ AudioAnalyzer::AudioAnalyzer() {
     _fft = new FFTCore(_fft_config);
     _samples_queue = xQueueCreate(10, sizeof(SamplesBuffer));
     xTaskCreate(
-        [] (void *context) {static_cast<AudioAnalyzer*>(context)->_analyzer_task();},
-        "ColorMusicTask",
-        COLOR_MUSIC_TASK_STACK_SIZE,
-        this,
-        COLOR_MUSIC_TASK_PRIORITY,
-        &_handle_audio_analyzer
+            [] (void *context) {static_cast<AudioAnalyzer*>(context)->_analyzer_task();},
+            "ColorMusicTask",
+            COLOR_MUSIC_TASK_STACK_SIZE,
+            this,
+            COLOR_MUSIC_TASK_PRIORITY,
+            &_handle_audio_analyzer
     );
 }
 
@@ -94,12 +94,12 @@ void AudioAnalyzer::setup_callbacks(CustomBluetoothA2DPSink *a2dp) {
 //void AudioAnalyzer::setup_callbacks(CustomBluetoothA2DPSink *a2dp, BDSPTransmitter *bdsp_transmitter_) {
     _a2dp = a2dp;
 //    _bdsp_transmitter = bdsp_transmitter_;
-//    a2dp->set_raw_stream_reader([] (const uint8_t *data, uint32_t length, void *context) {
-//        static_cast<AudioAnalyzer*>(context)->add_samples(data, length);
-//    }, this);
-//    a2dp->set_sample_rate_callback([] (uint16_t sampleRate, void *context) {
-//        auto &self = *static_cast<AudioAnalyzer*>(context);
-//        self._fft_config.frequency_step = float(sampleRate) / float(SAMPLES_SIZE);
-//        if (self._fft not_eq nullptr) self._fft->set_configs(self._fft_config);
-//    }, this);
+    a2dp->set_raw_stream_reader_ctx([] (const uint8_t *data, uint32_t length, void *context) {
+        static_cast<AudioAnalyzer*>(context)->add_samples(data, length);
+    }, this);
+    a2dp->set_sample_rate_callback_ctx([] (uint16_t sampleRate, void *context) {
+        auto &self = *static_cast<AudioAnalyzer*>(context);
+        self._fft_config.frequency_step = float(sampleRate) / float(SAMPLES_SIZE);
+        if (self._fft not_eq nullptr) self._fft->set_configs(self._fft_config);
+    }, this);
 }

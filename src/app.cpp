@@ -25,12 +25,14 @@ void App::setup() {
 //    }, nullptr);
 
 //    analyzer.setup_callbacks(&a2dp_sink, &transmitter);
+    analyzer.setup_callbacks(&a2dp_sink);
 
-    a2dp_sink.set_pin_config({
-        .bck_io_num = gpio_num_t(I2S_BCK_PIN),
-        .ws_io_num = gpio_num_t(I2S_WS_PIN),
-        .data_out_num = gpio_num_t(I2S_DATA_OUT_PIN)
-    });
+    auto cfg = i2s.defaultConfig();
+    cfg.pin_bck  = gpio_num_t(I2S_BCK_PIN);
+    cfg.pin_ws   = gpio_num_t(I2S_WS_PIN);
+    cfg.pin_data = gpio_num_t(I2S_DATA_OUT_PIN);
+    i2s.begin(cfg);
+    a2dp_sink.set_output(i2s);
     a2dp_sink.set_volume(64);
 
     AsyncInput::encoder_config_t encoder_cfg;
