@@ -5,7 +5,7 @@
 
 #include <Arduino.h>
 #include <AsyncInput.h>
-#include <BDSP.h>
+//#include <BDSP.h>
 
 #include "audio_analysis/audio_analyzer.h"
 #include "visualization/led_controller.h"
@@ -17,7 +17,7 @@ class App {
     ColorModesController color_modes_manager;
     AudioAnalyzer analyzer;
     CustomBluetoothA2DPSink a2dp_sink;
-    BDSPTransmitter transmitter;
+//    BDSPTransmitter transmitter;
     Encoder encoder;
     Button button;
 public:

@@ -3,7 +3,7 @@
 
 
 #include <cstdint>
-#include <BDSP.h>
+//#include <BDSP.h>
 #include "fft.h"
 #include "CustomBluetoothA2DPSink.h"
 
@@ -31,12 +31,13 @@ class AudioAnalyzer {
     QueueHandle_t _samples_queue = nullptr;
     TaskHandle_t _handle_audio_analyzer = nullptr;
     CustomBluetoothA2DPSink *_a2dp{};
-    BDSPTransmitter *_bdsp_transmitter{};
+//    BDSPTransmitter *_bdsp_transmitter{};
 public:
     AudioAnalyzer();
     ~AudioAnalyzer();
     void add_samples(const uint8_t *data, uint32_t length);
-    void setup_callbacks(CustomBluetoothA2DPSink *a2dp, BDSPTransmitter *bdsp_transmitter);
+    void setup_callbacks(CustomBluetoothA2DPSink *a2dp);
+//    void setup_callbacks(CustomBluetoothA2DPSink *a2dp, BDSPTransmitter *bdsp_transmitter);
     ChannelsAudioInformation get_channels_info();
 private:
     [[noreturn]] void _analyzer_task();

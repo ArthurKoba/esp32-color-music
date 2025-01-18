@@ -90,15 +90,16 @@ AudioInformation AudioAnalyzer::_calculate_audio_information_for_channel(float *
     return info;
 }
 
-void AudioAnalyzer::setup_callbacks(CustomBluetoothA2DPSink *a2dp, BDSPTransmitter *bdsp_transmitter_) {
+void AudioAnalyzer::setup_callbacks(CustomBluetoothA2DPSink *a2dp) {
+//void AudioAnalyzer::setup_callbacks(CustomBluetoothA2DPSink *a2dp, BDSPTransmitter *bdsp_transmitter_) {
     _a2dp = a2dp;
-    _bdsp_transmitter = bdsp_transmitter_;
-    a2dp->set_raw_stream_reader([] (const uint8_t *data, uint32_t length, void *context) {
-        static_cast<AudioAnalyzer*>(context)->add_samples(data, length);
-    }, this);
-    a2dp->set_sample_rate_callback([] (uint16_t sampleRate, void *context) {
-        auto &self = *static_cast<AudioAnalyzer*>(context);
-        self._fft_config.frequency_step = float(sampleRate) / float(SAMPLES_SIZE);
-        if (self._fft not_eq nullptr) self._fft->set_configs(self._fft_config);
-    }, this);
+//    _bdsp_transmitter = bdsp_transmitter_;
+//    a2dp->set_raw_stream_reader([] (const uint8_t *data, uint32_t length, void *context) {
+//        static_cast<AudioAnalyzer*>(context)->add_samples(data, length);
+//    }, this);
+//    a2dp->set_sample_rate_callback([] (uint16_t sampleRate, void *context) {
+//        auto &self = *static_cast<AudioAnalyzer*>(context);
+//        self._fft_config.frequency_step = float(sampleRate) / float(SAMPLES_SIZE);
+//        if (self._fft not_eq nullptr) self._fft->set_configs(self._fft_config);
+//    }, this);
 }
