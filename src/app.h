@@ -21,6 +21,10 @@ class App {
 //    BDSPTransmitter transmitter;
     Encoder encoder;
     Button button;
+
+    TaskHandle_t task_handle = nullptr;
+
+    [[noreturn]] [[noreturn]] void task();
 public:
     void setup();
     void tick();

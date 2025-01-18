@@ -24,6 +24,11 @@ void CustomBluetoothA2DPSink::audio_data_callback(const uint8_t *data, uint32_t 
         }
     }
 
+    if (raw_stream_reader_ctx) {
+        ESP_LOGD(BT_AV_TAG, "stream_reader_ctx");
+        (*raw_stream_reader_ctx)(data, len, raw_stream_reader_context);
+    }
+
     // make data available via callback, before volume control
     if (raw_stream_reader != nullptr) {
         ESP_LOGD(BT_AV_TAG, "raw_stream_reader");
@@ -37,11 +42,6 @@ void CustomBluetoothA2DPSink::audio_data_callback(const uint8_t *data, uint32_t 
     if (stream_reader != nullptr) {
         ESP_LOGD(BT_AV_TAG, "stream_reader");
         (*stream_reader)(data, len);
-    }
-
-    if (raw_stream_reader_ctx) {
-        ESP_LOGD(BT_AV_TAG, "stream_reader_ctx");
-        (*raw_stream_reader_ctx)(data, len, raw_stream_reader_context);
     }
 
     // put data into ringbuffer

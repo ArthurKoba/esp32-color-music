@@ -8,8 +8,8 @@ void setup() {
 }
 
 void loop() {
-//    vTaskDelete(nullptr);
-    app.tick();
+    vTaskDelete(nullptr); // bug fix incorrect work ticks
+//    app.tick();
 }
 #else
 #include "configs.h"

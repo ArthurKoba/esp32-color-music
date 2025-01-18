@@ -62,10 +62,27 @@ void App::setup() {
     a2dp_sink.start(BLUETOOTH_DEVICE_NAME);
 
     color_modes_manager.set_mode(CM_WATERFALL_MODE);
+
+    xTaskCreate(
+            [] (void *context) {
+                reinterpret_cast<App*>(context)->task();
+            },
+            "App",
+            4096,
+            this,
+            2,
+            &task_handle
+    );
 }
 
 void App::tick() {
     color_modes_manager.show_mode();
     encoder.tick();
     button.tick();
+}
+
+[[noreturn]] void App::task() {
+    while (true) {
+        tick();
+    }
 }
